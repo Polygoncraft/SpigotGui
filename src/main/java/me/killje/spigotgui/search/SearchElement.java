@@ -2,7 +2,7 @@ package me.killje.spigotgui.search;
 
 import java.util.Map;
 import me.killje.spigotgui.guielement.GuiElement;
-import me.killje.spigotgui.util.GuiSettings;
+import me.killje.spigotgui.util.GuiSetting;
 import me.killje.spigotgui.util.InventoryUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -27,7 +27,7 @@ public class SearchElement implements GuiElement {
     }
     
     @Override
-    public ItemStack getItemStack(GuiSettings guiSettings) {
+    public ItemStack getItemStack(GuiSetting guiSettings) {
         return guiSettings.getItemStack("search");
     }
 

@@ -1,7 +1,7 @@
 package me.killje.spigotgui.character;
 
 import me.killje.spigotgui.guielement.GuiElement;
-import me.killje.spigotgui.util.GuiSettings;
+import me.killje.spigotgui.util.GuiSetting;
 import me.killje.spigotgui.util.InventoryUtil;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -33,15 +33,15 @@ public abstract class SetStringButton implements GuiElement {
     }
     
     @Override
-    public ItemStack getItemStack(GuiSettings guiSettings) {
+    public ItemStack getItemStack(GuiSetting guiSettings) {
         if (keyBoardStringStorage.getCurrent().equals("")) {
             return noNameYetItem(guiSettings);
         }
         return confirmItem(guiSettings);
     }
     
-    protected abstract ItemStack confirmItem(GuiSettings guiSettings);
-    protected abstract ItemStack noNameYetItem(GuiSettings guiSettings);
-    protected abstract String textForEmpty(GuiSettings guiSettings);
+    protected abstract ItemStack confirmItem(GuiSetting guiSettings);
+    protected abstract ItemStack noNameYetItem(GuiSetting guiSettings);
+    protected abstract String textForEmpty(GuiSetting guiSettings);
     protected abstract void executeSet(InventoryUtil currentInventoryUtils, InventoryClickEvent event);
 }

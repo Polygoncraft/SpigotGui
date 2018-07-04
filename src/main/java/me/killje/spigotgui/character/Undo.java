@@ -1,7 +1,7 @@
 package me.killje.spigotgui.character;
 
 import me.killje.spigotgui.guielement.GuiElement;
-import me.killje.spigotgui.util.GuiSettings;
+import me.killje.spigotgui.util.GuiSetting;
 import me.killje.spigotgui.util.InventoryUtil;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -21,7 +21,7 @@ public class Undo implements GuiElement {
     }
     
     @Override
-    public ItemStack getItemStack(GuiSettings guiSettings) {
+    public ItemStack getItemStack(GuiSetting guiSettings) {
         return guiSettings.getItemStack(guiSettingName);
     }
 

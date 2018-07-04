@@ -69,22 +69,22 @@ public abstract class InventoryUtil implements Listener {
     private int fixedRows = 0;
     private boolean ignorePlayerInventory = true;
     
-    protected GuiSettings guiSettings;
+    protected GuiSetting guiSettings;
 
-    public InventoryUtil(GuiSettings guiSettings){
+    public InventoryUtil(GuiSetting guiSettings){
         this.guiSettings = guiSettings;
         this.pluginUtil = guiSettings.getPluginUtil();
         this.inventoryUtilsType = InventoryUtilsType.CUSTOM;
     }
 
-    public InventoryUtil(GuiSettings guiSettings, int rows) {
+    public InventoryUtil(GuiSetting guiSettings, int rows) {
         this.guiSettings = guiSettings;
         this.fixedRows = rows;
         this.pluginUtil = guiSettings.getPluginUtil();
         this.inventoryUtilsType = InventoryUtilsType.CUSTOM;
     }
 
-    public InventoryUtil(GuiSettings guiSettings, InventoryUtilsType inventoryUtilsType) {
+    public InventoryUtil(GuiSetting guiSettings, InventoryUtilsType inventoryUtilsType) {
         this.guiSettings = guiSettings;
         this.inventoryUtilsType = inventoryUtilsType;
         this.pluginUtil = guiSettings.getPluginUtil();
@@ -146,7 +146,7 @@ public abstract class InventoryUtil implements Listener {
         return this;
     }
 
-    public GuiSettings getGuiSettings() {
+    public GuiSetting getGuiSettings() {
         return guiSettings;
     }
 

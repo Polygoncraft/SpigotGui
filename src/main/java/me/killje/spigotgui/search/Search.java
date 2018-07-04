@@ -10,7 +10,7 @@ import me.killje.spigotgui.guielement.ReturnElement;
 import me.killje.spigotgui.list.Listable;
 import me.killje.spigotgui.list.NextPage;
 import me.killje.spigotgui.list.PrevPage;
-import me.killje.spigotgui.util.GuiSettings;
+import me.killje.spigotgui.util.GuiSetting;
 import me.killje.spigotgui.util.InventoryUtil;
 import org.bukkit.entity.Player;
 
@@ -25,7 +25,7 @@ public class Search extends KeyBoard implements Listable {
     private final Player player;
     private int page = 0;
     
-    public Search(GuiSettings guiSettings, Player player, Map<String, ? extends GuiElement> searchable) {
+    public Search(GuiSetting guiSettings, Player player, Map<String, ? extends GuiElement> searchable) {
         super(guiSettings, player, 6);
         this.searchable = searchable;
         this.player = player;

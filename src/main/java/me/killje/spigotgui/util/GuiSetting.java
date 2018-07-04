@@ -17,7 +17,7 @@ import org.bukkit.plugin.Plugin;
  *
  * @author Patrick Beuks (killje) <patrick.beuks@gmail.com>
  */
-public class GuiSettings {
+public class GuiSetting {
 
     private final clsConfiguration guiFile;
     private final PluginUtil pluginUtil;
@@ -30,7 +30,7 @@ public class GuiSettings {
         }
     }
     
-    public GuiSettings(Plugin plugin, String guiFile) {
+    public GuiSetting(Plugin plugin, String guiFile) {
         this.pluginUtil = new PluginUtil(plugin);
         this.guiFile = new clsConfiguration(plugin, guiFile, true);
     }

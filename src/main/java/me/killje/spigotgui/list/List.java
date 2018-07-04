@@ -3,7 +3,7 @@ package me.killje.spigotgui.list;
 import java.util.HashMap;
 import java.util.Map;
 import me.killje.spigotgui.guielement.Exit;
-import me.killje.spigotgui.util.GuiSettings;
+import me.killje.spigotgui.util.GuiSetting;
 import me.killje.spigotgui.util.InventoryUtil;
 import org.bukkit.entity.Player;
 
@@ -16,7 +16,7 @@ public abstract class List extends InventoryUtil implements Listable{
     private int page = 0;
     private final Player player;
     
-    public List(GuiSettings guiSettings, Player currentPlayer) {
+    public List(GuiSetting guiSettings, Player currentPlayer) {
         super(guiSettings, 6);
         this.player = currentPlayer;
     }

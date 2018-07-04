@@ -6,7 +6,7 @@ import java.util.Map;
 import me.killje.spigotgui.guielement.GuiElement;
 import me.killje.spigotgui.guielement.SimpleGuiElement;
 import me.killje.spigotgui.search.SearchElement;
-import me.killje.spigotgui.util.GuiSettings;
+import me.killje.spigotgui.util.GuiSetting;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.HumanEntity;
@@ -24,7 +24,7 @@ public class PlayerList extends List {
     
     private final SearchElement searchElement;
 
-    public PlayerList(GuiSettings guiSettings, Player currentPlayer, PlayerListElementFetcher playerListGuiElement) {
+    public PlayerList(GuiSetting guiSettings, Player currentPlayer, PlayerListElementFetcher playerListGuiElement) {
         super(guiSettings, currentPlayer);
         
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {

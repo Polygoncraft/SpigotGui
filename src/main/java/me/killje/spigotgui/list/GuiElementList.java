@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import me.killje.spigotgui.guielement.GuiElement;
 import me.killje.spigotgui.search.SearchElement;
-import me.killje.spigotgui.util.GuiSettings;
+import me.killje.spigotgui.util.GuiSetting;
 import org.bukkit.entity.Player;
 
 /**
@@ -15,7 +15,7 @@ public abstract class GuiElementList extends List {
     
     private final String inventoryName;
 
-    public GuiElementList(GuiSettings guiSettings, Player currentPlayer, String inventoryName) {
+    public GuiElementList(GuiSetting guiSettings, Player currentPlayer, String inventoryName) {
         super(guiSettings, currentPlayer);
         this.inventoryName = inventoryName;
     }

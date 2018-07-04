@@ -2,7 +2,7 @@ package me.killje.spigotgui.character;
 
 import me.killje.spigotgui.guielement.Exit;
 import me.killje.spigotgui.guielement.GuiElement;
-import me.killje.spigotgui.util.GuiSettings;
+import me.killje.spigotgui.util.GuiSetting;
 import me.killje.spigotgui.util.InventoryUtil;
 import org.bukkit.entity.Player;
 
@@ -16,11 +16,11 @@ public abstract class KeyBoard extends InventoryUtil implements StorageUpdateLis
     private final Player player;
     private final GuiElement setStringButton;
 
-    public KeyBoard(GuiSettings guiSettings, Player player) {
+    public KeyBoard(GuiSetting guiSettings, Player player) {
         this(guiSettings, player, null);
     }
 
-    public KeyBoard(GuiSettings guiSettings, Player player, SetStringButton setStringButton) {
+    public KeyBoard(GuiSetting guiSettings, Player player, SetStringButton setStringButton) {
         super(guiSettings);
         keyBoardStringStorage = new KeyBoardStringStorage();
         keyBoardStringStorage.addListener(this);
@@ -31,11 +31,11 @@ public abstract class KeyBoard extends InventoryUtil implements StorageUpdateLis
         }
     }
 
-    public KeyBoard(GuiSettings guiSettings, Player player, int rows) {
+    public KeyBoard(GuiSetting guiSettings, Player player, int rows) {
         this(guiSettings, player, rows, null);
     }
 
-    public KeyBoard(GuiSettings guiSettings, Player player, int rows, SetStringButton setStringButton) {
+    public KeyBoard(GuiSetting guiSettings, Player player, int rows, SetStringButton setStringButton) {
         super(guiSettings, rows);
         keyBoardStringStorage = new KeyBoardStringStorage();
         keyBoardStringStorage.addListener(this);

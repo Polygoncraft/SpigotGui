@@ -1,6 +1,6 @@
 package me.killje.spigotgui.guielement;
 
-import me.killje.spigotgui.util.GuiSettings;
+import me.killje.spigotgui.util.GuiSetting;
 import me.killje.spigotgui.util.InventoryUtil;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -27,7 +27,7 @@ public class SimpleGuiElement implements GuiElement{
     
     
     @Override
-    public ItemStack getItemStack(GuiSettings guiSettings) {
+    public ItemStack getItemStack(GuiSetting guiSettings) {
         if (name != null) {
             ItemMeta itemMeta = element.getItemMeta();
             itemMeta.setDisplayName(name);

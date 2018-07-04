@@ -2,7 +2,7 @@ package me.killje.spigotgui.character;
 
 import me.killje.spigotgui.guielement.Exit;
 import me.killje.spigotgui.guielement.GuiElement;
-import me.killje.spigotgui.util.GuiSettings;
+import me.killje.spigotgui.util.GuiSetting;
 import me.killje.spigotgui.util.InventoryUtil;
 import org.bukkit.entity.Player;
 
@@ -16,7 +16,7 @@ public abstract class NumberBoard extends InventoryUtil implements StorageUpdate
     private final Player player;
     private final GuiElement setAmountButton;
     
-    public NumberBoard(GuiSettings guiSettings, Player player, SetAmountButton setAmountButton) {
+    public NumberBoard(GuiSetting guiSettings, Player player, SetAmountButton setAmountButton) {
         super(guiSettings);
         amountStorage = new AmountStorage();
         amountStorage.addListener(this);
