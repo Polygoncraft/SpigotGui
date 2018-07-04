@@ -103,7 +103,7 @@ public class GuiSetting {
         switch (type) {
 
             case "head":
-                return HeadUtils.getTexturedHead(value, displayName, lore);
+                return HeadUtil.getTexturedHead(value, displayName, lore);
             case "item":
                 ItemStack itemStack;
                 switch (value) {

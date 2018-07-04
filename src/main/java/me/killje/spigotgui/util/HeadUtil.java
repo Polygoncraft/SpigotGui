@@ -18,7 +18,7 @@ import org.bukkit.inventory.meta.SkullMeta;
  *
  * @author Patrick Beuks (killje) <patrick.beuks@gmail.com>
  */
-public class HeadUtils {
+public class HeadUtil {
 
     private final static HashMap<String, String> TEXTURES = new HashMap<>();
 
