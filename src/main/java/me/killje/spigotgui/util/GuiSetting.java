@@ -145,12 +145,24 @@ public class GuiSetting {
         }
         for (Map.Entry<String, String> replaceItem : chatColors.entrySet()) {
             String replaceFrom = replaceItem.getKey();
+            if (replaceFrom == null) {
+                replaceFrom = "";
+            }
             String replaceTo = replaceItem.getValue();
+            if (replaceTo == null) {
+                replaceTo = "";
+            }
             text = text.replaceAll("&" + replaceFrom, replaceTo);
         }
         for (Map.Entry<String, String> replaceItem : replaceMap.entrySet()) {
             String replaceFrom = replaceItem.getKey();
+            if (replaceFrom == null) {
+                replaceFrom = "";
+            }
             String replaceTo = replaceItem.getValue();
+            if (replaceTo == null) {
+                replaceTo = "";
+            }
             text = text.replaceAll("%" + replaceFrom, replaceTo);
         }
         return text;
