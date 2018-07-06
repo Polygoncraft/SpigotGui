@@ -1,6 +1,6 @@
 package me.killje.spigotgui.guielement;
 
-import me.killje.spigotgui.util.InventoryUtil;
+import me.killje.spigotgui.util.InventoryBase;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 /**
@@ -9,6 +9,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
  */
 public interface InventoryElement {
 
-    public void onInventoryClickEvent(InventoryUtil currentInventoryUtils, InventoryClickEvent event);
+    public void onInventoryClickEvent(InventoryBase currentInventoryBase, InventoryClickEvent event);
 
 }

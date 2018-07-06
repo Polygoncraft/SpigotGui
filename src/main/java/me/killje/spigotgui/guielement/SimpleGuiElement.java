@@ -1,7 +1,7 @@
 package me.killje.spigotgui.guielement;
 
 import me.killje.spigotgui.util.GuiSetting;
-import me.killje.spigotgui.util.InventoryUtil;
+import me.killje.spigotgui.util.InventoryBase;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -37,7 +37,7 @@ public class SimpleGuiElement implements GuiElement {
     }
 
     @Override
-    public void onInventoryClickEvent(InventoryUtil currentInventoryUtils, InventoryClickEvent event) {
+    public void onInventoryClickEvent(InventoryBase currentinventoryBase, InventoryClickEvent event) {
     }
 
 }

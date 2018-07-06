@@ -3,14 +3,14 @@ package me.killje.spigotgui.character;
 import me.killje.spigotgui.guielement.Exit;
 import me.killje.spigotgui.guielement.GuiElement;
 import me.killje.spigotgui.util.GuiSetting;
-import me.killje.spigotgui.util.InventoryUtil;
+import me.killje.spigotgui.util.InventoryBase;
 import org.bukkit.entity.Player;
 
 /**
  *
  * @author Patrick Beuks (killje) <patrick.beuks@gmail.com>
  */
-public abstract class NumberBoard extends InventoryUtil implements StorageUpdateListener {
+public abstract class NumberBoard extends InventoryBase implements StorageUpdateListener {
 
     private final AmountStorage amountStorage;
     private final Player player;

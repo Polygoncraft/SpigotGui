@@ -11,7 +11,7 @@ import me.killje.spigotgui.list.Listable;
 import me.killje.spigotgui.list.NextPage;
 import me.killje.spigotgui.list.PrevPage;
 import me.killje.spigotgui.util.GuiSetting;
-import me.killje.spigotgui.util.InventoryUtil;
+import me.killje.spigotgui.util.InventoryBase;
 import org.bukkit.entity.Player;
 
 /**
@@ -21,7 +21,7 @@ import org.bukkit.entity.Player;
 public class Search extends KeyBoard implements Listable {
 
     private final Map<String, ? extends GuiElement> searchable;
-    private InventoryUtil prevInventory = null;
+    private InventoryBase prevInventory = null;
     private final Player player;
     private int page = 0;
 
@@ -69,7 +69,7 @@ public class Search extends KeyBoard implements Listable {
         this.setInventoryName(guiSettings.getText(getGuiSettingsName(), replaceList));
     }
 
-    public void setPrevInventory(InventoryUtil prevInventory) {
+    public void setPrevInventory(InventoryBase prevInventory) {
         this.prevInventory = prevInventory;
     }
 

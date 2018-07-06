@@ -2,7 +2,7 @@ package me.killje.spigotgui.character;
 
 import me.killje.spigotgui.guielement.GuiElement;
 import me.killje.spigotgui.util.GuiSetting;
-import me.killje.spigotgui.util.InventoryUtil;
+import me.killje.spigotgui.util.InventoryBase;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -23,12 +23,12 @@ public abstract class SetStringButton implements GuiElement {
     }
 
     @Override
-    public void onInventoryClickEvent(InventoryUtil currentInventoryUtils, InventoryClickEvent event) {
+    public void onInventoryClickEvent(InventoryBase currentinventoryBase, InventoryClickEvent event) {
         if (keyBoardStringStorage.getCurrent().equals("")) {
-            event.getWhoClicked().sendMessage(textForEmpty(currentInventoryUtils.getGuiSettings()));
+            event.getWhoClicked().sendMessage(textForEmpty(currentinventoryBase.getGuiSettings()));
             return;
         }
-        executeSet(currentInventoryUtils, event);
+        executeSet(currentinventoryBase, event);
     }
 
     @Override
@@ -45,5 +45,5 @@ public abstract class SetStringButton implements GuiElement {
 
     protected abstract String textForEmpty(GuiSetting guiSettings);
 
-    protected abstract void executeSet(InventoryUtil currentInventoryUtils, InventoryClickEvent event);
+    protected abstract void executeSet(InventoryBase currentinventoryBase, InventoryClickEvent event);
 }

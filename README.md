@@ -38,4 +38,4 @@ To implement your own GuiElement extand from GuiElement and implement abstract m
 
 ## Implementing Custom inventories
 
-If the provided inventories do not suit your needs you can also implement your own by either extending 'List' or 'InventoryUtil'
+If the provided inventories do not suit your needs you can also implement your own by either extending 'List' or 'inventoryBase'

@@ -2,7 +2,7 @@ package me.killje.spigotgui.character;
 
 import me.killje.spigotgui.guielement.GuiElement;
 import me.killje.spigotgui.util.GuiSetting;
-import me.killje.spigotgui.util.InventoryUtil;
+import me.killje.spigotgui.util.InventoryBase;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -26,7 +26,7 @@ public class Character implements GuiElement {
     }
 
     @Override
-    public void onInventoryClickEvent(InventoryUtil currentInventoryUtils, InventoryClickEvent event) {
+    public void onInventoryClickEvent(InventoryBase currentinventoryBase, InventoryClickEvent event) {
         keyBoardStringStorage.add(character + "");
     }
 

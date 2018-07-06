@@ -4,14 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 import me.killje.spigotgui.guielement.Exit;
 import me.killje.spigotgui.util.GuiSetting;
-import me.killje.spigotgui.util.InventoryUtil;
+import me.killje.spigotgui.util.InventoryBase;
 import org.bukkit.entity.Player;
 
 /**
  *
  * @author Patrick Beuks (killje) <patrick.beuks@gmail.com>
  */
-public abstract class List extends InventoryUtil implements Listable {
+public abstract class List extends InventoryBase implements Listable {
 
     private int page = 0;
     private final Player player;

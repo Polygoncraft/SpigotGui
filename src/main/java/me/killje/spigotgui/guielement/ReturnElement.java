@@ -1,7 +1,7 @@
 package me.killje.spigotgui.guielement;
 
 import me.killje.spigotgui.util.GuiSetting;
-import me.killje.spigotgui.util.InventoryUtil;
+import me.killje.spigotgui.util.InventoryBase;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -11,9 +11,9 @@ import org.bukkit.inventory.ItemStack;
  */
 public class ReturnElement implements GuiElement {
 
-    private final InventoryUtil prevInventory;
+    private final InventoryBase prevInventory;
 
-    public ReturnElement(InventoryUtil prevInventory) {
+    public ReturnElement(InventoryBase prevInventory) {
         this.prevInventory = prevInventory;
     }
 
@@ -23,8 +23,8 @@ public class ReturnElement implements GuiElement {
     }
 
     @Override
-    public void onInventoryClickEvent(InventoryUtil currentInventoryUtils, InventoryClickEvent event) {
-        currentInventoryUtils.openNewInventory(event.getWhoClicked(), prevInventory);
+    public void onInventoryClickEvent(InventoryBase currentinventoryBase, InventoryClickEvent event) {
+        currentinventoryBase.openNewInventory(event.getWhoClicked(), prevInventory);
     }
 
 }
