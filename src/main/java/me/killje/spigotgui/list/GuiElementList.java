@@ -13,11 +13,8 @@ import org.bukkit.entity.Player;
  */
 public abstract class GuiElementList extends List {
     
-    private final String inventoryName;
-
-    public GuiElementList(GuiSetting guiSettings, Player currentPlayer, String inventoryName) {
+    public GuiElementList(GuiSetting guiSettings, Player currentPlayer) {
         super(guiSettings, currentPlayer);
-        this.inventoryName = inventoryName;
     }
 
     @Override
@@ -31,11 +28,6 @@ public abstract class GuiElementList extends List {
         }
         
         return guiElements.size();
-    }
-
-    @Override
-    protected String getInventoryName() {
-        return inventoryName;
     }
     
     protected abstract Map<String, ? extends GuiElement> getElementMap();
