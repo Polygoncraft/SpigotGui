@@ -11,13 +11,13 @@ import org.bukkit.inventory.ItemStack;
  * @author Patrick Beuks (killje) <patrick.beuks@gmail.com>
  */
 public class PrevPage implements GuiElement {
-    
+
     private final Listable list;
-    
+
     public PrevPage(Listable list) {
         this.list = list;
     }
-    
+
     @Override
     public void onInventoryClickEvent(InventoryUtil currentInventoryUtils, InventoryClickEvent event) {
         list.previousPage();
@@ -27,5 +27,5 @@ public class PrevPage implements GuiElement {
     public ItemStack getItemStack(GuiSetting guiSettings) {
         return guiSettings.getItemStack("page.prev");
     }
-    
+
 }

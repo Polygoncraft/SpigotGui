@@ -145,7 +145,7 @@ public class HeadUtil {
             Object NMS_NBTTagCompound_skullOwner = NMS_NBTTagCompound_Constructor.newInstance();
             Object NMS_NBTTagCompound_properties = NMS_NBTTagCompound_Constructor.newInstance();
             Object NMS_NBTTagCompound_valueCompound = NMS_NBTTagCompound_Constructor.newInstance();
-            
+
             Object NMS_NBTTagList_textures = NMS_NBTTagList_Constructor.newInstance();
 
             Object NMS_NBTTagString_value = NMS_NBTTagString_Constructor_String.newInstance(texture);
@@ -201,7 +201,7 @@ public class HeadUtil {
 
         return (ItemStack) CB_CraftItemStack_asBukkitCopy.invoke(CB_CraftItemStack, NMS_ItemStack_itemStack);
     }
-    
+
     private static ItemStack getBaseHead() {
         return new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
     }

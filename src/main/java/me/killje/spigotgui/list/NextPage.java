@@ -11,9 +11,9 @@ import org.bukkit.inventory.ItemStack;
  * @author Patrick Beuks (killje) <patrick.beuks@gmail.com>
  */
 public class NextPage implements GuiElement {
-    
+
     private final Listable list;
-    
+
     public NextPage(Listable list) {
         this.list = list;
     }
@@ -27,7 +27,5 @@ public class NextPage implements GuiElement {
     public ItemStack getItemStack(GuiSetting guiSettings) {
         return guiSettings.getItemStack("page.next");
     }
-    
-    
-    
+
 }

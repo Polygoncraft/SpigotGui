@@ -14,7 +14,7 @@ public class Number implements GuiElement {
 
     private final int number;
     private final AmountStorage amountStorage;
-    
+
     public Number(int number, AmountStorage amountStorage) {
         this.number = number;
         this.amountStorage = amountStorage;
@@ -29,5 +29,5 @@ public class Number implements GuiElement {
     public void onInventoryClickEvent(InventoryUtil currentInventoryUtils, InventoryClickEvent event) {
         amountStorage.add(number);
     }
-    
+
 }

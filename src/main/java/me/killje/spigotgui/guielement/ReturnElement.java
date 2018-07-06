@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack;
  * @author Patrick Beuks (killje) <patrick.beuks@gmail.com>
  */
 public class ReturnElement implements GuiElement {
-    
+
     private final InventoryUtil prevInventory;
 
     public ReturnElement(InventoryUtil prevInventory) {
@@ -26,5 +26,5 @@ public class ReturnElement implements GuiElement {
     public void onInventoryClickEvent(InventoryUtil currentInventoryUtils, InventoryClickEvent event) {
         currentInventoryUtils.openNewInventory(event.getWhoClicked(), prevInventory);
     }
-    
+
 }

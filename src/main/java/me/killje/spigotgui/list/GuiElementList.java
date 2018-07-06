@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
  * @author Patrick Beuks (killje) <patrick.beuks@gmail.com>
  */
 public abstract class GuiElementList extends List {
-    
+
     public GuiElementList(GuiSetting guiSettings, Player currentPlayer) {
         super(guiSettings, currentPlayer);
     }
@@ -26,10 +26,10 @@ public abstract class GuiElementList extends List {
         for (int i = startIndex; i < stopIndex && i < guiElements.size(); i++) {
             this.addGuiElement(guiElements.get(i));
         }
-        
+
         return guiElements.size();
     }
-    
+
     protected abstract Map<String, ? extends GuiElement> getElementMap();
-    
+
 }

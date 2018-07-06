@@ -20,6 +20,5 @@ public class Exit implements GuiElement {
     public void onInventoryClickEvent(InventoryUtil currentInventoryUtils, InventoryClickEvent event) {
         currentInventoryUtils.closeInventory(event.getWhoClicked());
     }
-    
-    
+
 }

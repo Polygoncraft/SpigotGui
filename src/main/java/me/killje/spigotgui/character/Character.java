@@ -11,7 +11,7 @@ import org.bukkit.inventory.ItemStack;
  * @author Patrick Beuks (killje) <patrick.beuks@gmail.com>
  */
 public class Character implements GuiElement {
-    
+
     private final char character;
     private final KeyBoardStringStorage keyBoardStringStorage;
 

@@ -29,7 +29,7 @@ public class GuiSetting {
             chatColors.put(chatColor.name(), chatColor.toString());
         }
     }
-    
+
     public GuiSetting(Plugin plugin, String guiFile) {
         this.pluginUtil = new PluginUtil(plugin);
         this.guiFile = new clsConfiguration(plugin, guiFile, true);
@@ -136,10 +136,10 @@ public class GuiSetting {
     }
 
     public String getText(String name, Map<String, String> replaceMap) {
-        
+
         ConfigurationSection configurationSection = guiFile.GetConfig().getConfigurationSection("texts");
         String text = configurationSection.getString(name);
-        
+
         if (text == null) {
             return "";
         }

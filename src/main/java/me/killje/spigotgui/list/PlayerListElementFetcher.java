@@ -8,7 +8,7 @@ import org.bukkit.OfflinePlayer;
  * @author Patrick Beuks (killje) <patrick.beuks@gmail.com>
  */
 public interface PlayerListElementFetcher {
-    
-    public GuiElement getGuiElement (OfflinePlayer offlinePlayer);
-    
+
+    public GuiElement getGuiElement(OfflinePlayer offlinePlayer);
+
 }

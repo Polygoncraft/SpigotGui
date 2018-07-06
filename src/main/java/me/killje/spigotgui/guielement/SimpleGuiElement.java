@@ -10,12 +10,12 @@ import org.bukkit.inventory.meta.ItemMeta;
  *
  * @author Patrick Beuks (killje) <patrick.beuks@gmail.com>
  */
-public class SimpleGuiElement implements GuiElement{
+public class SimpleGuiElement implements GuiElement {
 
     private final ItemStack element;
     private final String name;
 
-    public SimpleGuiElement (ItemStack itemStack) {
+    public SimpleGuiElement(ItemStack itemStack) {
         this.element = itemStack;
         name = null;
     }
@@ -24,8 +24,7 @@ public class SimpleGuiElement implements GuiElement{
         this.element = element;
         this.name = name;
     }
-    
-    
+
     @Override
     public ItemStack getItemStack(GuiSetting guiSettings) {
         if (name != null) {
@@ -34,11 +33,11 @@ public class SimpleGuiElement implements GuiElement{
             element.setItemMeta(itemMeta);
         }
         return element;
-        
+
     }
-    
+
     @Override
     public void onInventoryClickEvent(InventoryUtil currentInventoryUtils, InventoryClickEvent event) {
     }
-    
+
 }

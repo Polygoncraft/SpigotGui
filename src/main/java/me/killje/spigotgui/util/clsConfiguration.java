@@ -51,7 +51,7 @@ public class clsConfiguration {
         if (file == null) {
             file = new File(plugin.getDataFolder(), fname);
         }
-        
+
         conf = YamlConfiguration.loadConfiguration(file);
 
         //Look for defaults in the jar

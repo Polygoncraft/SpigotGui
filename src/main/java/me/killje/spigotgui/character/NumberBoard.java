@@ -15,7 +15,7 @@ public abstract class NumberBoard extends InventoryUtil implements StorageUpdate
     private final AmountStorage amountStorage;
     private final Player player;
     private final GuiElement setAmountButton;
-    
+
     public NumberBoard(GuiSetting guiSettings, Player player, SetAmountButton setAmountButton) {
         super(guiSettings);
         amountStorage = new AmountStorage();
@@ -24,13 +24,13 @@ public abstract class NumberBoard extends InventoryUtil implements StorageUpdate
         this.setAmountButton = setAmountButton;
         setAmountButton.setAmountStorage(amountStorage);
     }
-    
+
     @Override
     protected void initInventory() {
-        
+
         this
                 .setInventoryName(getInventoryName())
-                .addGuiElementTransposed(new Number(1, amountStorage),1)
+                .addGuiElementTransposed(new Number(1, amountStorage), 1)
                 .addGuiElement(new Number(2, amountStorage))
                 .addGuiElement(new Number(3, amountStorage))
                 .nextRow()
@@ -47,11 +47,11 @@ public abstract class NumberBoard extends InventoryUtil implements StorageUpdate
                 .addGuiElement(setAmountButton)
                 .addGuiElement(new Exit(), 8);
     }
-    
+
     @Override
     public void onStorageupdateEvent() {
         player.openInventory(this.getInventory());
-        
+
         getPluginUtil().runTask(new Runnable() {
             @Override
             public void run() {
@@ -59,11 +59,11 @@ public abstract class NumberBoard extends InventoryUtil implements StorageUpdate
             }
         });
     }
-    
+
     protected final AmountStorage getAmountStorage() {
         return amountStorage;
     }
-    
+
     protected abstract String getInventoryName();
-    
+
 }

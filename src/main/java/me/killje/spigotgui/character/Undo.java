@@ -14,12 +14,12 @@ public class Undo implements GuiElement {
 
     private final AbstractStorage abstractStorage;
     private final String guiSettingName;
-    
+
     public Undo(AbstractStorage abstractStorage, String guiSettingName) {
         this.abstractStorage = abstractStorage;
         this.guiSettingName = guiSettingName;
     }
-    
+
     @Override
     public ItemStack getItemStack(GuiSetting guiSettings) {
         return guiSettings.getItemStack(guiSettingName);
@@ -29,5 +29,5 @@ public class Undo implements GuiElement {
     public void onInventoryClickEvent(InventoryUtil currentInventoryUtils, InventoryClickEvent event) {
         abstractStorage.removeLast();
     }
-    
+
 }

@@ -68,10 +68,10 @@ public abstract class InventoryUtil implements Listener {
     private boolean isInit = true;
     private int fixedRows = 0;
     private boolean ignorePlayerInventory = true;
-    
+
     protected GuiSetting guiSettings;
 
-    public InventoryUtil(GuiSetting guiSettings){
+    public InventoryUtil(GuiSetting guiSettings) {
         this.guiSettings = guiSettings;
         this.pluginUtil = guiSettings.getPluginUtil();
         this.inventoryUtilsType = InventoryUtilsType.CUSTOM;
@@ -107,7 +107,7 @@ public abstract class InventoryUtil implements Listener {
 
         ItemStack[] inventoryItems = new ItemStack[realRows * inventoryUtilsType.getRowSize()];
 
-        for (int i = 0; i < guiElements.size(); i ++) {
+        for (int i = 0; i < guiElements.size(); i++) {
             GuiElement guiElement = guiElements.get(i);
             if (guiElement == null) {
                 continue;
@@ -135,7 +135,7 @@ public abstract class InventoryUtil implements Listener {
         }
 
         inventory.setContents(inventoryItems);
-        
+
         isInit = false;
         index = 0;
         return inventory;
@@ -222,7 +222,7 @@ public abstract class InventoryUtil implements Listener {
     public void closeInventory(HumanEntity humanEntity) {
         closeInventory(humanEntity, false);
     }
-    
+
     public void closeInventory(HumanEntity humanEntity, boolean isClosed) {
         InventoryClickEvent.getHandlerList().unregister(this);
         InventoryDragEvent.getHandlerList().unregister(this);
@@ -238,13 +238,13 @@ public abstract class InventoryUtil implements Listener {
 
     public void openNewInventory(HumanEntity humanEntity, InventoryUtil inventoryUtils) {
         Inventory inventory_ = inventoryUtils.getInventory();
-        
+
         if (inventory_.getSize() == inventory.getSize() && humanEntity instanceof Player) {
-            
+
             Player player = (Player) humanEntity;
             inventoryUtils.attachListener();
             closeInventory(humanEntity, true);
-            
+
             player.openInventory(inventory_);
             getPluginUtil().runTask(new Runnable() {
                 @Override
@@ -253,7 +253,7 @@ public abstract class InventoryUtil implements Listener {
                 }
             });
         } else {
-            
+
             closeInventory(humanEntity);
 
             getPluginUtil().runTask(new Runnable() {
@@ -266,14 +266,14 @@ public abstract class InventoryUtil implements Listener {
         }
 
     }
-    
+
     public void openInventory(HumanEntity humanEntity) {
         attachListener();
         humanEntity.openInventory(getInventory());
     }
-    
+
     public void updateInventory(HumanEntity humanEntity) {
-        
+
         if (!(humanEntity instanceof Player)) {
             return;
         }
@@ -286,32 +286,31 @@ public abstract class InventoryUtil implements Listener {
             }
         });
     }
-    
+
     public void reloadInventory() {
         int realRows = guiElements.size() / inventoryUtilsType.getRowSize();
 
         if (guiElements.size() % inventoryUtilsType.getRowSize() != 0) {
             realRows++;
         }
-        
+
         ItemStack[] inventoryItems = new ItemStack[realRows * inventoryUtilsType.getRowSize()];
 
-        for (int i = 0; i < guiElements.size(); i ++) {
+        for (int i = 0; i < guiElements.size(); i++) {
             GuiElement guiElement = guiElements.get(i);
             if (guiElement == null) {
                 continue;
             }
             inventoryItems[i] = guiElement.getItemStack(guiSettings);
         }
-        
+
         inventory.setContents(inventoryItems);
     }
-    
+
     public void updateItem(GuiElement item) {
         inventory.setItem(guiElements.indexOf(item), item.getItemStack(guiSettings));
     }
-    
-    
+
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onInventoryDragEvent(InventoryDragEvent event) {
         if (event.getInventory().equals(inventory)) {
@@ -321,19 +320,19 @@ public abstract class InventoryUtil implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onInventoryClickEvent(InventoryClickEvent event) {
-        
+
         if (isInit) {
             return;
         }
-        
+
         if (!event.getInventory().equals(inventory)) {
             return;
         }
 
         event.setCancelled(true);
-        
+
         if (!ignorePlayerInventory && getClickedInventory(event) != null && getClickedInventory(event).equals(event.getWhoClicked().getInventory())) {
-            
+
             if (event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
                 for (int i = 0; i < inventoryElements.size(); i++) {
                     InventoryElement inventoryElement = inventoryElements.get(i);
@@ -354,7 +353,7 @@ public abstract class InventoryUtil implements Listener {
         if (getClickedInventory(event) == null || !getClickedInventory(event).equals(inventory)) {
             return;
         }
-        
+
         int index = event.getRawSlot();
         if (index >= inventoryElements.size()) {
             return;
@@ -369,14 +368,14 @@ public abstract class InventoryUtil implements Listener {
         inventoryElement.onInventoryClickEvent(this, event);
 
     }
-    
+
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onInventoryCloseEvent(InventoryCloseEvent event) {
         if (event.getInventory().equals(inventory)) {
             closeInventory(event.getPlayer(), true);
         }
     }
-    
+
     private Inventory getClickedInventory(InventoryClickEvent event) {
         if (event.getRawSlot() < 0) {
             return null;
@@ -386,7 +385,7 @@ public abstract class InventoryUtil implements Listener {
             return event.getView().getBottomInventory();
         }
     }
-    
+
     public PluginUtil getPluginUtil() {
         return pluginUtil;
     }

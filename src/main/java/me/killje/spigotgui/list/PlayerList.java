@@ -21,29 +21,29 @@ public class PlayerList extends List {
 
     private final java.util.List<GuiElement> onlinePlayers = new ArrayList<>();
     private final java.util.List<GuiElement> offlinePlayers;
-    
+
     private final SearchElement searchElement;
 
     public PlayerList(GuiSetting guiSettings, Player currentPlayer, PlayerListElementFetcher playerListGuiElement) {
         super(guiSettings, currentPlayer);
-        
+
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             onlinePlayers.add(playerListGuiElement.getGuiElement(onlinePlayer));
         }
-        
+
         Map<String, GuiElement> searchables = new HashMap<>();
         for (OfflinePlayer offlinePlayer : Bukkit.getOfflinePlayers()) {
             GuiElement playerElement = playerListGuiElement.getGuiElement(offlinePlayer);
             searchables.put(offlinePlayer.getName(), playerElement);
         }
         offlinePlayers = new ArrayList<>(searchables.values());
-        
+
         this.searchElement = new SearchElement(searchables, this);
     }
 
     @Override
     protected int initInventory(int startIndex, int stopIndex, int maxItemsOnPage) {
-        
+
         addGuiElement(searchElement);
 
         int onlineInventorySize = onlinePlayers.isEmpty() ? 0 : onlinePlayers.size() + 9 + (8 - (onlinePlayers.size() - 1) % 9);
