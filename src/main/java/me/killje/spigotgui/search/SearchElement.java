@@ -1,6 +1,5 @@
 package me.killje.spigotgui.search;
 
-import java.util.Map;
 import me.killje.spigotgui.guielement.GuiElement;
 import me.killje.spigotgui.util.GuiSetting;
 import me.killje.spigotgui.util.InventoryBase;
@@ -14,16 +13,10 @@ import org.bukkit.inventory.ItemStack;
  */
 public class SearchElement implements GuiElement {
 
-    private final Map<String, ? extends GuiElement> searchables;
-    private final InventoryBase prevInventory;
+    private final Searchable searchable;
 
-    public SearchElement(Map<String, ? extends GuiElement> searchables) {
-        this(searchables, null);
-    }
-
-    public SearchElement(Map<String, ? extends GuiElement> searchables, InventoryBase prevInventory) {
-        this.searchables = searchables;
-        this.prevInventory = prevInventory;
+    public SearchElement(Searchable searchable) {
+        this.searchable = searchable;
     }
 
     @Override
@@ -40,9 +33,9 @@ public class SearchElement implements GuiElement {
 
         Player player = (Player) event.getWhoClicked();
 
-        Search search = new Search(currentinventoryBase.getGuiSettings(), player, searchables);
-        if (prevInventory != null) {
-            search.setPrevInventory(prevInventory);
+        Search search = new Search(currentinventoryBase.getGuiSettings(), player, searchable.getElementMap());
+        if (searchable.InventoryBeforeSearch() != null) {
+            search.setPrevInventory(searchable.InventoryBeforeSearch());
         }
         currentinventoryBase.openNewInventory(player, search);
     }

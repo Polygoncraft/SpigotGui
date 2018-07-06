@@ -6,7 +6,9 @@ import java.util.Map;
 import me.killje.spigotgui.guielement.GuiElement;
 import me.killje.spigotgui.guielement.SimpleGuiElement;
 import me.killje.spigotgui.search.SearchElement;
+import me.killje.spigotgui.search.Searchable;
 import me.killje.spigotgui.util.GuiSetting;
+import me.killje.spigotgui.util.InventoryBase;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.HumanEntity;
@@ -17,10 +19,11 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
  *
  * @author Patrick Beuks (killje) <patrick.beuks@gmail.com>
  */
-public class PlayerList extends List {
+public class PlayerList extends List implements Searchable {
 
     private final java.util.List<GuiElement> onlinePlayers = new ArrayList<>();
-    private final java.util.List<GuiElement> offlinePlayers;
+    private final Map<String, GuiElement> offlinePlayers = new HashMap<>();
+    private final java.util.List<GuiElement> offlinePlayerList;
 
     private final SearchElement searchElement;
 
@@ -31,14 +34,13 @@ public class PlayerList extends List {
             onlinePlayers.add(playerListGuiElement.getGuiElement(onlinePlayer));
         }
 
-        Map<String, GuiElement> searchables = new HashMap<>();
         for (OfflinePlayer offlinePlayer : Bukkit.getOfflinePlayers()) {
             GuiElement playerElement = playerListGuiElement.getGuiElement(offlinePlayer);
-            searchables.put(offlinePlayer.getName(), playerElement);
+            offlinePlayers.put(offlinePlayer.getName(), playerElement);
         }
-        offlinePlayers = new ArrayList<>(searchables.values());
-
-        this.searchElement = new SearchElement(searchables, this);
+        
+        offlinePlayerList = new ArrayList<>(offlinePlayers.values());
+        this.searchElement = new SearchElement(this);
     }
 
     @Override
@@ -48,7 +50,7 @@ public class PlayerList extends List {
 
         int onlineInventorySize = onlinePlayers.isEmpty() ? 0 : onlinePlayers.size() + 9 + (8 - (onlinePlayers.size() - 1) % 9);
 
-        int totalSize = offlinePlayers.size() + onlineInventorySize;
+        int totalSize = offlinePlayerList.size() + onlineInventorySize;
 
         int offlineStartLocation = startIndex - onlineInventorySize;
         if (offlineStartLocation < 0) {
@@ -59,15 +61,15 @@ public class PlayerList extends List {
         if (offlineStopLocation < 0) {
             offlineStopLocation = 0;
         }
-        if (offlineStopLocation > offlinePlayers.size()) {
-            offlineStopLocation = offlinePlayers.size();
+        if (offlineStopLocation > offlinePlayerList.size()) {
+            offlineStopLocation = offlinePlayerList.size();
         }
 
         if (onlinePlayers.size() < startIndex) {
             this.addGuiElement(new SimpleGuiElement(guiSettings.getItemStack("allPlayerList")), 4);
             this.nextRow();
 
-            for (GuiElement offlinePlayer : offlinePlayers.subList(offlineStartLocation, offlineStopLocation)) {
+            for (GuiElement offlinePlayer : offlinePlayerList.subList(offlineStartLocation, offlineStopLocation)) {
                 this.addGuiElement(offlinePlayer);
             }
         } else {
@@ -94,7 +96,7 @@ public class PlayerList extends List {
                 this.addGuiElement(new SimpleGuiElement(guiSettings.getItemStack("allPlayerFiller")), (onlineInventorySize % maxItemsOnPage) + 7);
                 this.addGuiElement(new SimpleGuiElement(guiSettings.getItemStack("allPlayerFiller")), (onlineInventorySize % maxItemsOnPage) + 8);
 
-                for (GuiElement offlinePlayer : offlinePlayers.subList(offlineStartLocation, offlineStopLocation - offlineStartLocation)) {
+                for (GuiElement offlinePlayer : offlinePlayerList.subList(offlineStartLocation, offlineStopLocation - offlineStartLocation)) {
                     this.addGuiElement(offlinePlayer);
                 }
 
@@ -140,6 +142,16 @@ public class PlayerList extends List {
         super.openInventory(humanEntity);
 
         thread.interrupt();
+    }
+
+    @Override
+    public Map<String, ? extends GuiElement> getElementMap() {
+        return offlinePlayers;
+    }
+
+    @Override
+    public InventoryBase InventoryBeforeSearch() {
+        return this;
     }
 
 }
