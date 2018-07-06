@@ -20,7 +20,9 @@ public abstract class GuiElementList extends List {
     @Override
     protected int initInventory(int startIndex, int stopIndex, int maxItemsOnPage) {
         Map<String, ? extends GuiElement> elementMap = getElementMap();
-        this.addGuiElement(new SearchElement(elementMap, this));
+        if (addSearch()) {
+            this.addGuiElement(new SearchElement(elementMap, this));
+        }
         java.util.List<? extends GuiElement> guiElements = new ArrayList<>(elementMap.values());
         this.nextRow();
         for (int i = startIndex; i < stopIndex && i < guiElements.size(); i++) {
@@ -28,6 +30,10 @@ public abstract class GuiElementList extends List {
         }
 
         return guiElements.size();
+    }
+    
+    protected boolean addSearch() {
+        return true;
     }
 
     protected abstract Map<String, ? extends GuiElement> getElementMap();
