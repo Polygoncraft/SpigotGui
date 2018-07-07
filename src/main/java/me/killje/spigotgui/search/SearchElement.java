@@ -1,6 +1,7 @@
 package me.killje.spigotgui.search;
 
 import me.killje.spigotgui.guielement.GuiElement;
+import me.killje.spigotgui.list.PlayerListSearcher;
 import me.killje.spigotgui.util.GuiSetting;
 import me.killje.spigotgui.util.InventoryBase;
 import org.bukkit.entity.Player;
@@ -14,9 +15,16 @@ import org.bukkit.inventory.ItemStack;
 public class SearchElement implements GuiElement {
 
     private final Searchable searchable;
+    private final PlayerListSearcher playerListSearcher;
 
     public SearchElement(Searchable searchable) {
         this.searchable = searchable;
+        playerListSearcher = null;
+    }
+    
+    public SearchElement(PlayerListSearcher playerListSearcher) {
+        this.searchable = null;
+        this.playerListSearcher = playerListSearcher;
     }
 
     @Override
@@ -33,10 +41,22 @@ public class SearchElement implements GuiElement {
 
         Player player = (Player) event.getWhoClicked();
 
-        Search search = new Search(currentinventoryBase.getGuiSettings(), player, searchable.getElementMap());
-        if (searchable.InventoryBeforeSearch() != null) {
-            search.setPrevInventory(searchable.InventoryBeforeSearch());
+        
+        Search search;
+        if (searchable != null) {
+            search = new Search(currentinventoryBase.getGuiSettings(), player, searchable.getElementMap());
+            
+            if (searchable.InventoryBeforeSearch() != null) {
+                search.setPrevInventory(searchable.InventoryBeforeSearch());
+            }
+        } else {
+            search = new Search(currentinventoryBase.getGuiSettings(), player, playerListSearcher);
+            
+            if (playerListSearcher.InventoryBeforeSearch() != null) {
+                search.setPrevInventory(playerListSearcher.InventoryBeforeSearch());
+            }
         }
+        
         currentinventoryBase.openNewInventory(player, search);
     }
 

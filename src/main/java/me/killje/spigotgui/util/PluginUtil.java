@@ -1,9 +1,17 @@
 package me.killje.spigotgui.util;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -11,12 +19,28 @@ import org.bukkit.scheduler.BukkitTask;
  *
  * @author Patrick Beuks (killje) <patrick.beuks@gmail.com>
  */
-public class PluginUtil {
+public class PluginUtil implements Listener {
 
     private final Plugin plugin;
+    private final List<OfflinePlayer> offlinePlayerList;
+    private final Map<String, OfflinePlayer> offlinePlayerMap = new HashMap<>();
 
     public PluginUtil(Plugin plugin) {
         this.plugin = plugin;
+        offlinePlayerList = Arrays.asList(plugin.getServer().getOfflinePlayers());
+        for (OfflinePlayer offlinePlayer : offlinePlayerList) {
+            offlinePlayerMap.put(offlinePlayer.getName(), offlinePlayer);
+        }
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+    }
+    
+    @EventHandler
+    public void onPlayerJoinEvent(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        if (!offlinePlayerList.contains(player)) {
+            offlinePlayerList.add(player);
+            offlinePlayerMap.put(player.getName(), player);
+        }
     }
 
     public Plugin getPlugin() {
@@ -56,6 +80,14 @@ public class PluginUtil {
 
     public FileConfiguration getConfig() {
         return getPlugin().getConfig();
+    }
+
+    public List<OfflinePlayer> getOfflinePlayerList() {
+        return offlinePlayerList;
+    }
+
+    public Map<String, OfflinePlayer> getOfflinePlayerMap() {
+        return offlinePlayerMap;
     }
 
 }

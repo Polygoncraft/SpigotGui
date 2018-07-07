@@ -9,9 +9,12 @@ import me.killje.spigotgui.guielement.GuiElement;
 import me.killje.spigotgui.guielement.ReturnElement;
 import me.killje.spigotgui.list.Listable;
 import me.killje.spigotgui.list.NextPage;
+import me.killje.spigotgui.list.PlayerListElementFetcher;
+import me.killje.spigotgui.list.PlayerListSearcher;
 import me.killje.spigotgui.list.PrevPage;
 import me.killje.spigotgui.util.GuiSetting;
 import me.killje.spigotgui.util.InventoryBase;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 /**
@@ -21,6 +24,7 @@ import org.bukkit.entity.Player;
 public class Search extends KeyBoard implements Listable {
 
     private final Map<String, ? extends GuiElement> searchable;
+    private final PlayerListSearcher playerListSearcher;
     private InventoryBase prevInventory = null;
     private final Player player;
     private int page = 0;
@@ -28,6 +32,14 @@ public class Search extends KeyBoard implements Listable {
     public Search(GuiSetting guiSettings, Player player, Map<String, ? extends GuiElement> searchable) {
         super(guiSettings, player, 6);
         this.searchable = searchable;
+        this.playerListSearcher = null;
+        this.player = player;
+    }
+
+    public Search(GuiSetting guiSettings, Player player, PlayerListSearcher playerListSearcher) {
+        super(guiSettings, player, 6);
+        this.searchable = null;
+        this.playerListSearcher = playerListSearcher;
         this.player = player;
     }
 
@@ -81,15 +93,30 @@ public class Search extends KeyBoard implements Listable {
         searchKey = searchKey.toLowerCase();
         List<GuiElement> matches = new ArrayList<>();
 
-        for (Map.Entry<String, ? extends GuiElement> entry : searchable.entrySet()) {
-            String key = entry.getKey();
-            GuiElement value = entry.getValue();
+        if (searchable != null) {
+            for (Map.Entry<String, ? extends GuiElement> entry : searchable.entrySet()) {
+                String key = entry.getKey();
+                GuiElement value = entry.getValue();
 
-            if (!key.toLowerCase().matches(".*" + searchKey + ".*")) {
-                continue;
+                if (!key.toLowerCase().matches(".*" + searchKey + ".*")) {
+                    continue;
+                }
+
+                matches.add(value);
             }
+        } else if (playerListSearcher != null) {
+            PlayerListElementFetcher playerListElementFetcher = playerListSearcher.getPlayerListElementFetcher();
+            for (Map.Entry<String, OfflinePlayer> entry : playerListSearcher.getPlayerMap().entrySet()) {
+                String key = entry.getKey();
+                OfflinePlayer value = entry.getValue();
 
-            matches.add(value);
+                if (!key.toLowerCase().matches(".*" + searchKey + ".*")) {
+                    continue;
+                }
+
+                matches.add(playerListElementFetcher.getGuiElement(value));
+                
+            }
         }
         return matches;
     }

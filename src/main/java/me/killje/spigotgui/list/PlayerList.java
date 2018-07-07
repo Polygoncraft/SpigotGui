@@ -1,46 +1,47 @@
 package me.killje.spigotgui.list;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
-import me.killje.spigotgui.guielement.GuiElement;
 import me.killje.spigotgui.guielement.SimpleGuiElement;
 import me.killje.spigotgui.search.SearchElement;
-import me.killje.spigotgui.search.Searchable;
 import me.killje.spigotgui.util.GuiSetting;
-import me.killje.spigotgui.util.InventoryBase;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.scheduler.BukkitTask;
 
 /**
  *
  * @author Patrick Beuks (killje) <patrick.beuks@gmail.com>
  */
-public class PlayerList extends List implements Searchable {
+public class PlayerList extends List {
 
-    private final java.util.List<GuiElement> onlinePlayers = new ArrayList<>();
-    private final Map<String, GuiElement> offlinePlayers = new HashMap<>();
-    private final java.util.List<GuiElement> offlinePlayerList;
+    private final java.util.List<OfflinePlayer> onlinePlayers = new ArrayList<>();
+    private final Map<String, OfflinePlayer> offlinePlayers;
+    private final java.util.List<OfflinePlayer> offlinePlayerList;
+    
+    private final PlayerListElementFetcher playerListGuiElement;
 
     private final SearchElement searchElement;
 
+    private final GuiSetting guiSetting;
+    
     public PlayerList(GuiSetting guiSettings, Player currentPlayer, PlayerListElementFetcher playerListGuiElement) {
         super(guiSettings, currentPlayer);
-
+        this.playerListGuiElement = playerListGuiElement;
+        
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-            onlinePlayers.add(playerListGuiElement.getGuiElement(onlinePlayer));
-        }
-
-        for (OfflinePlayer offlinePlayer : Bukkit.getOfflinePlayers()) {
-            GuiElement playerElement = playerListGuiElement.getGuiElement(offlinePlayer);
-            offlinePlayers.put(offlinePlayer.getName(), playerElement);
+            onlinePlayers.add(onlinePlayer);
         }
         
-        offlinePlayerList = new ArrayList<>(offlinePlayers.values());
-        this.searchElement = new SearchElement(this);
+        this.guiSetting = guiSettings;
+        
+        offlinePlayerList = guiSettings.getPluginUtil().getOfflinePlayerList();
+        offlinePlayers = guiSettings.getPluginUtil().getOfflinePlayerMap();
+        
+        this.searchElement = new SearchElement(new PlayerListSearcher(offlinePlayers, playerListGuiElement, this));
     }
 
     @Override
@@ -69,8 +70,8 @@ public class PlayerList extends List implements Searchable {
             this.addGuiElement(new SimpleGuiElement(guiSettings.getItemStack("allPlayerList")), 4);
             this.nextRow();
 
-            for (GuiElement offlinePlayer : offlinePlayerList.subList(offlineStartLocation, offlineStopLocation)) {
-                this.addGuiElement(offlinePlayer);
+            for (OfflinePlayer offlinePlayer : offlinePlayerList.subList(offlineStartLocation, offlineStopLocation)) {
+                this.addGuiElement(playerListGuiElement.getGuiElement(offlinePlayer));
             }
         } else {
             this.addGuiElement(new SimpleGuiElement(guiSettings.getItemStack("onlinePlayerList")), 4);
@@ -81,8 +82,8 @@ public class PlayerList extends List implements Searchable {
                 toIndex = onlinePlayers.size();
             }
 
-            for (GuiElement offlinePlayer : onlinePlayers.subList(startIndex, toIndex)) {
-                this.addGuiElement(offlinePlayer);
+            for (OfflinePlayer offlinePlayer : onlinePlayers.subList(startIndex, toIndex)) {
+                this.addGuiElement(playerListGuiElement.getGuiElement(offlinePlayer));
             }
 
             if (stopIndex - onlineInventorySize > 9) {
@@ -96,8 +97,8 @@ public class PlayerList extends List implements Searchable {
                 this.addGuiElement(new SimpleGuiElement(guiSettings.getItemStack("allPlayerFiller")), (onlineInventorySize % maxItemsOnPage) + 7);
                 this.addGuiElement(new SimpleGuiElement(guiSettings.getItemStack("allPlayerFiller")), (onlineInventorySize % maxItemsOnPage) + 8);
 
-                for (GuiElement offlinePlayer : offlinePlayerList.subList(offlineStartLocation, offlineStopLocation - offlineStartLocation)) {
-                    this.addGuiElement(offlinePlayer);
+                for (OfflinePlayer offlinePlayer : offlinePlayerList.subList(offlineStartLocation, offlineStopLocation - offlineStartLocation)) {
+                    this.addGuiElement(playerListGuiElement.getGuiElement(offlinePlayer));
                 }
 
             }
@@ -126,32 +127,23 @@ public class PlayerList extends List implements Searchable {
     @Override
     public void openInventory(HumanEntity humanEntity) {
 
-        Thread thread = new Thread(new Runnable() {
+        BukkitTask runTaskAsynchronously = Bukkit.getScheduler().runTaskAsynchronously(guiSettings.getPluginUtil().getPlugin(), new Runnable() {
             @Override
             public void run() {
                 try {
-                    Thread.sleep(200);
+                    Thread.sleep(1);
+                    System.out.println("here");
                     humanEntity.sendMessage("Loading heads. This can take a while the first time");
                 } catch (InterruptedException ex) {
                     // Thread interupted, player has inventory open
                 }
             }
+            
         });
-        thread.start();
 
         super.openInventory(humanEntity);
 
-        thread.interrupt();
-    }
-
-    @Override
-    public Map<String, ? extends GuiElement> getElementMap() {
-        return offlinePlayers;
-    }
-
-    @Override
-    public InventoryBase InventoryBeforeSearch() {
-        return this;
+        runTaskAsynchronously.cancel();
     }
 
 }
