@@ -146,8 +146,8 @@ public class HeadUtil {
         
         ItemStack baseHead = getBaseHead();
         
-        AsyncHeadLoader asyncHeadLoader = new AsyncHeadLoader(baseHead, player);
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, asyncHeadLoader);
+//        AsyncHeadLoader asyncHeadLoader = new AsyncHeadLoader(baseHead, player);
+//        Bukkit.getScheduler().runTaskAsynchronously(plugin, asyncHeadLoader);
         
         LOADED_PLAYER_HEADS.put(playerUUID, baseHead);
 
