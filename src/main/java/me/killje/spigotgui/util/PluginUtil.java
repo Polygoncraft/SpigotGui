@@ -1,5 +1,6 @@
 package me.killje.spigotgui.util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +28,7 @@ public class PluginUtil implements Listener {
 
     public PluginUtil(Plugin plugin) {
         this.plugin = plugin;
-        offlinePlayerList = Arrays.asList(plugin.getServer().getOfflinePlayers());
+        offlinePlayerList = new ArrayList<>(Arrays.asList(plugin.getServer().getOfflinePlayers()));
         for (OfflinePlayer offlinePlayer : offlinePlayerList) {
             offlinePlayerMap.put(offlinePlayer.getName(), offlinePlayer);
         }

@@ -151,7 +151,7 @@ public class HeadUtil {
         
         LOADED_PLAYER_HEADS.put(playerUUID, baseHead);
 
-        return baseHead;
+        return baseHead.clone();
                 
     }
 

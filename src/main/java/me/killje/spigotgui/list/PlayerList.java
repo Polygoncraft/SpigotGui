@@ -131,8 +131,7 @@ public class PlayerList extends List {
             @Override
             public void run() {
                 try {
-                    Thread.sleep(1);
-                    System.out.println("here");
+                    Thread.sleep(100);
                     humanEntity.sendMessage("Loading heads. This can take a while the first time");
                 } catch (InterruptedException ex) {
                     // Thread interupted, player has inventory open
