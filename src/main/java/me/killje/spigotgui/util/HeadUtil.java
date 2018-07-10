@@ -51,8 +51,8 @@ public class HeadUtil {
     private final static HashMap<String, String> TEXTURES = new HashMap<>();
     private final static HashMap<String, ItemStack> LOADED_PLAYER_HEADS = new HashMap<>();
 
-    private final static int MAX_REQUESTS_PER_INTERFALL = 500;
-    private final static int REQUEST_INTERFALL_MILISECONDS = 1800000;
+    private final static int MAX_REQUESTS_PER_INTERVAL = 500;
+    private final static int REQUEST_INTERVAL_MILISECONDS = 1800000;
 
     private static int requests = 0;
     private static long requestTimestamp = System.currentTimeMillis();
@@ -161,12 +161,12 @@ public class HeadUtil {
             return LOADED_PLAYER_HEADS.get(playerUUID).clone();
         }
 
-        if (requestTimestamp + REQUEST_INTERFALL_MILISECONDS < System.currentTimeMillis()) {
+        if (requestTimestamp + REQUEST_INTERVAL_MILISECONDS < System.currentTimeMillis()) {
             requests = 0;
             requestTimestamp = System.currentTimeMillis();
         }
 
-        if (requests > MAX_REQUESTS_PER_INTERFALL) {
+        if (requests > MAX_REQUESTS_PER_INTERVAL) {
             return getBaseHead();
         }
         
@@ -187,12 +187,12 @@ public class HeadUtil {
             return LOADED_PLAYER_HEADS.get(playerUUID).clone();
         }
 
-        if (requestTimestamp + REQUEST_INTERFALL_MILISECONDS < System.currentTimeMillis()) {
+        if (requestTimestamp + REQUEST_INTERVAL_MILISECONDS < System.currentTimeMillis()) {
             requests = 0;
             requestTimestamp = System.currentTimeMillis();
         }
 
-        if (requests > MAX_REQUESTS_PER_INTERFALL) {
+        if (requests > MAX_REQUESTS_PER_INTERVAL) {
             return getBaseHead();
         }
         
