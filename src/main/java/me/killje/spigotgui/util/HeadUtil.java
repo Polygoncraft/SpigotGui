@@ -21,25 +21,41 @@ import org.bukkit.plugin.Plugin;
  */
 public class HeadUtil {
 
-    private static class AsyncHeadLoader implements Runnable {
+    protected static class AsyncPlayerHead extends ItemStack {
 
-        private final ItemStack head;
-        private final OfflinePlayer offlinePlayer;
+        private final OfflinePlayer player;
+        private final ItemStack original;
 
-        public AsyncHeadLoader(ItemStack head, OfflinePlayer offlinePlayer) {
-            this.head = head;
-            this.offlinePlayer = offlinePlayer;
+        public AsyncPlayerHead(OfflinePlayer player) throws IllegalArgumentException {
+            super(getBaseHead());
+            original = getBaseHead();
+            this.player = player;
         }
 
-        @Override
-        public void run() {
-            HeadUtil.setPlayerHead(head, offlinePlayer);
+        /**
+         * Load the player head item stack and the original player head
+         *
+         * This is because the item stack meta data might have changed
+         */
+        public void loadHead() {
+            setPlayerHead(this, player);
+            setPlayerHead(original, player);
+        }
+
+        private ItemStack getOriginal() {
+            return original;
         }
 
     }
 
     private final static HashMap<String, String> TEXTURES = new HashMap<>();
     private final static HashMap<String, ItemStack> LOADED_PLAYER_HEADS = new HashMap<>();
+
+    private final static int MAX_REQUESTS_PER_INTERFALL = 500;
+    private final static int REQUEST_INTERFALL_MILISECONDS = 1800000;
+
+    private static int requests = 0;
+    private static long requestTimestamp = System.currentTimeMillis();
 
     private final static Constructor<?> NMS_NBTTagCompound_Constructor;
     private final static Method NMS_NBTTagCompound_set;
@@ -136,37 +152,55 @@ public class HeadUtil {
         NMS_NBTTagString_Constructor_String = NMS_NBTTagString_Constructor_String_Assignment;
     }
 
+    @Deprecated
     public static ItemStack getPlayerHead(OfflinePlayer player, Plugin plugin) {
-        
+
         String playerUUID = player.getUniqueId().toString();
 
         if (LOADED_PLAYER_HEADS.containsKey(playerUUID)) {
             return LOADED_PLAYER_HEADS.get(playerUUID).clone();
         }
-        
-        ItemStack baseHead = getBaseHead();
-        
-//        AsyncHeadLoader asyncHeadLoader = new AsyncHeadLoader(baseHead, player);
-//        Bukkit.getScheduler().runTaskAsynchronously(plugin, asyncHeadLoader);
-        
-        LOADED_PLAYER_HEADS.put(playerUUID, baseHead);
 
-        return baseHead.clone();
-                
+        if (requestTimestamp + REQUEST_INTERFALL_MILISECONDS < System.currentTimeMillis()) {
+            requests = 0;
+            requestTimestamp = System.currentTimeMillis();
+        }
+
+        if (requests > MAX_REQUESTS_PER_INTERFALL) {
+            return getBaseHead();
+        }
+        
+        requests++;
+
+        AsyncPlayerHead baseHead = new AsyncPlayerHead(player);
+
+        LOADED_PLAYER_HEADS.put(playerUUID, baseHead.getOriginal());
+
+        return baseHead;
     }
 
-    @Deprecated
     public static ItemStack getPlayerHead(OfflinePlayer player) {
+
         String playerUUID = player.getUniqueId().toString();
 
         if (LOADED_PLAYER_HEADS.containsKey(playerUUID)) {
             return LOADED_PLAYER_HEADS.get(playerUUID).clone();
         }
-        ItemStack baseHead = getBaseHead();
+
+        if (requestTimestamp + REQUEST_INTERFALL_MILISECONDS < System.currentTimeMillis()) {
+            requests = 0;
+            requestTimestamp = System.currentTimeMillis();
+        }
+
+        if (requests > MAX_REQUESTS_PER_INTERFALL) {
+            return getBaseHead();
+        }
         
-        setPlayerHead(baseHead, player);
-        
-        LOADED_PLAYER_HEADS.put(playerUUID, baseHead);
+        requests++;
+
+        AsyncPlayerHead baseHead = new AsyncPlayerHead(player);
+
+        LOADED_PLAYER_HEADS.put(playerUUID, baseHead.getOriginal());
 
         return baseHead;
     }

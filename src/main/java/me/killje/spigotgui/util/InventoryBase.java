@@ -1,8 +1,12 @@
 package me.killje.spigotgui.util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import me.killje.spigotgui.guielement.GuiElement;
 import me.killje.spigotgui.guielement.InventoryElement;
+import me.killje.spigotgui.util.HeadUtil.AsyncPlayerHead;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -13,6 +17,7 @@ import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -60,14 +65,15 @@ public abstract class InventoryBase implements Listener {
 
     private Inventory inventory;
     private final InventoryBaseType inventoryBaseType;
-    private final ArrayList<GuiElement> guiElements = new ArrayList<>();
-    private final ArrayList<InventoryElement> inventoryElements = new ArrayList<>();
+    private final List<GuiElement> guiElements = new ArrayList<>();
+    private final List<InventoryElement> inventoryElements = new ArrayList<>();
     private final PluginUtil pluginUtil;
     private int index = 0;
     private String name = null;
     private boolean isInit = true;
     private int fixedRows = 0;
     private boolean ignorePlayerInventory = true;
+    private final Map<Integer, AsyncPlayerHead> asyncHeadItems = new HashMap<>();
 
     protected GuiSetting guiSettings;
 
@@ -105,6 +111,7 @@ public abstract class InventoryBase implements Listener {
             realRows++;
         }
 
+        asyncHeadItems.clear();
         ItemStack[] inventoryItems = new ItemStack[realRows * inventoryBaseType.getRowSize()];
 
         for (int i = 0; i < guiElements.size(); i++) {
@@ -112,7 +119,11 @@ public abstract class InventoryBase implements Listener {
             if (guiElement == null) {
                 continue;
             }
-            inventoryItems[i] = guiElement.getItemStack(guiSettings);
+            ItemStack itemStack = guiElement.getItemStack(guiSettings);
+            if (itemStack instanceof AsyncPlayerHead) {
+                asyncHeadItems.put(i, (AsyncPlayerHead) itemStack);
+            }
+            inventoryItems[i] = itemStack;
         }
 
         int rowsToDraw = realRows;
@@ -227,6 +238,7 @@ public abstract class InventoryBase implements Listener {
         InventoryClickEvent.getHandlerList().unregister(this);
         InventoryDragEvent.getHandlerList().unregister(this);
         InventoryCloseEvent.getHandlerList().unregister(this);
+        InventoryOpenEvent.getHandlerList().unregister(this);
         if (!isClosed) {
             humanEntity.closeInventory();
             if (humanEntity instanceof Player) {
@@ -294,6 +306,7 @@ public abstract class InventoryBase implements Listener {
             realRows++;
         }
 
+        asyncHeadItems.clear();
         ItemStack[] inventoryItems = new ItemStack[realRows * inventoryBaseType.getRowSize()];
 
         for (int i = 0; i < guiElements.size(); i++) {
@@ -301,7 +314,11 @@ public abstract class InventoryBase implements Listener {
             if (guiElement == null) {
                 continue;
             }
-            inventoryItems[i] = guiElement.getItemStack(guiSettings);
+            ItemStack itemStack = guiElement.getItemStack(guiSettings);
+            if (itemStack instanceof AsyncPlayerHead) {
+                asyncHeadItems.put(i, (AsyncPlayerHead) itemStack);
+            }
+            inventoryItems[i] = itemStack;
         }
 
         inventory.setContents(inventoryItems);
@@ -373,6 +390,25 @@ public abstract class InventoryBase implements Listener {
     public void onInventoryCloseEvent(InventoryCloseEvent event) {
         if (event.getInventory().equals(inventory)) {
             closeInventory(event.getPlayer(), true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void OnInventoryOpenEvent(InventoryOpenEvent event) {
+        if (asyncHeadItems.isEmpty()) {
+            return;
+        }
+        for (Map.Entry<Integer, AsyncPlayerHead> headItem : asyncHeadItems.entrySet()) {
+            Integer index = headItem.getKey();
+            AsyncPlayerHead playerHead = headItem.getValue();
+
+            getGuiSettings().getPluginUtil().runTaskAsynchronously(new Runnable() {
+                @Override
+                public void run() {
+                    playerHead.loadHead();
+                    inventory.setItem(index, playerHead);
+                }
+            });
         }
     }
 

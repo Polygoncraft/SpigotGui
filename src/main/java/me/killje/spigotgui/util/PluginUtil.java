@@ -5,12 +5,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.Plugin;
@@ -35,10 +37,10 @@ public class PluginUtil implements Listener {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
     
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerJoinEvent(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        if (!offlinePlayerList.contains(player)) {
+        if (!player.hasPlayedBefore()) {
             offlinePlayerList.add(player);
             offlinePlayerMap.put(player.getName(), player);
         }
@@ -51,6 +53,12 @@ public class PluginUtil implements Listener {
         return plugin;
     }
 
+    /**
+     * Gets the logger for the current plugin
+     * 
+     * @return Returns the logger for the current plugin given
+     * @see Plugin#getLogger()
+     */
     public Logger getLogger() {
         return getPlugin().getLogger();
     }
