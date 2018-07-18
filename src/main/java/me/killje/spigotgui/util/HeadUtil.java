@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 import org.bukkit.Bukkit;
@@ -21,57 +22,29 @@ import org.bukkit.plugin.Plugin;
  */
 public class HeadUtil {
 
-    protected static class AsyncPlayerHead extends ItemStack {
+    private final static Class<?> CB_CraftItemStack;
+    private final static Method CB_CraftItemStack_asBukkitCopy;
+    private final static Method CB_CraftItemStack_asNMSCopy;
 
-        private final OfflinePlayer player;
-        private final ItemStack original;
-
-        public AsyncPlayerHead(OfflinePlayer player) throws IllegalArgumentException {
-            super(getBaseHead());
-            original = getBaseHead();
-            this.player = player;
-        }
-
-        /**
-         * Load the player head item stack and the original player head
-         *
-         * This is because the item stack meta data might have changed
-         */
-        public void loadHead() {
-            setPlayerHead(this, player);
-            setPlayerHead(original, player);
-        }
-
-        private ItemStack getOriginal() {
-            return original;
-        }
-
-    }
-
-    private final static HashMap<String, String> TEXTURES = new HashMap<>();
-    private final static HashMap<String, ItemStack> LOADED_PLAYER_HEADS = new HashMap<>();
-
+    private final static Map<String, ItemStack> LOADED_PLAYER_HEADS
+            = new HashMap<>();
     private final static int MAX_REQUESTS_PER_INTERVAL = 500;
-    private final static int REQUEST_INTERVAL_MILISECONDS = 1800000;
 
-    private static int requests = 0;
-    private static long requestTimestamp = System.currentTimeMillis();
+    private final static Method NMS_ItemStack_getTag;
+    private final static Method NMS_ItemStack_setTag;
 
     private final static Constructor<?> NMS_NBTTagCompound_Constructor;
     private final static Method NMS_NBTTagCompound_set;
     private final static Method NMS_NBTTagCompound_setString;
 
-    private final static Method NMS_ItemStack_getTag;
-    private final static Method NMS_ItemStack_setTag;
-
-    private final static Class<?> CB_CraftItemStack;
-    private final static Method CB_CraftItemStack_asNMSCopy;
-    private final static Method CB_CraftItemStack_asBukkitCopy;
-
     private final static Constructor<?> NMS_NBTTagList_Constructor;
     private final static Method NMS_NBTTagList_add;
 
     private final static Constructor<?> NMS_NBTTagString_Constructor_String;
+    private final static int REQUEST_INTERVAL_MILISECONDS = 1800000;
+    private final static HashMap<String, String> TEXTURES = new HashMap<>();
+    private static long requestTimestamp = System.currentTimeMillis();
+    private static int requests = 0;
 
     static {
 
@@ -94,27 +67,44 @@ public class HeadUtil {
         try {
             Class<?> NMS_NBTBase = BukkitReflection.getNMSClass("NBTBase");
 
-            Class<?> NMS_NBTTagCompound = BukkitReflection.getNMSClass("NBTTagCompound");
-            NMS_NBTTagCompound_Constructor_Assignment = NMS_NBTTagCompound.getConstructor();
-            NMS_NBTTagCompound_set_Assignment = NMS_NBTTagCompound.getMethod("set", String.class, NMS_NBTBase);
-            NMS_NBTTagCompound_setString_Assignment = NMS_NBTTagCompound.getMethod("setString", String.class, String.class);
+            Class<?> NMS_NBTTagCompound = BukkitReflection.getNMSClass(
+                    "NBTTagCompound");
+            NMS_NBTTagCompound_Constructor_Assignment = NMS_NBTTagCompound.
+                    getConstructor();
+            NMS_NBTTagCompound_set_Assignment = NMS_NBTTagCompound.getMethod(
+                    "set", String.class, NMS_NBTBase);
+            NMS_NBTTagCompound_setString_Assignment = NMS_NBTTagCompound.
+                    getMethod("setString", String.class, String.class);
 
             Class<?> NMS_ItemStack = BukkitReflection.getNMSClass("ItemStack");
             NMS_ItemStack_getTag_Assignment = NMS_ItemStack.getMethod("getTag");
-            NMS_ItemStack_setTag_Assignment = NMS_ItemStack.getMethod("setTag", NMS_NBTTagCompound);
+            NMS_ItemStack_setTag_Assignment = NMS_ItemStack.getMethod("setTag",
+                    NMS_NBTTagCompound);
 
-            CB_CraftItemStack_Assignment = BukkitReflection.getCBClass("inventory.CraftItemStack");
-            CB_CraftItemStack_asNMSCopy_Assignment = CB_CraftItemStack_Assignment.getMethod("asNMSCopy", ItemStack.class);
-            CB_CraftItemStack_asBukkitCopy_Assignment = CB_CraftItemStack_Assignment.getMethod("asBukkitCopy", NMS_ItemStack);
+            CB_CraftItemStack_Assignment = BukkitReflection.getCBClass(
+                    "inventory.CraftItemStack");
+            CB_CraftItemStack_asNMSCopy_Assignment
+                    = CB_CraftItemStack_Assignment.getMethod("asNMSCopy",
+                            ItemStack.class);
+            CB_CraftItemStack_asBukkitCopy_Assignment
+                    = CB_CraftItemStack_Assignment.getMethod("asBukkitCopy",
+                            NMS_ItemStack);
 
-            Class<?> NMS_NBTTagList = BukkitReflection.getNMSClass("NBTTagList");
-            NMS_NBTTagList_Constructor_Assignment = NMS_NBTTagList.getConstructor();
-            NMS_NBTTagList_add_Assignment = NMS_NBTTagList.getMethod("add", NMS_NBTBase);
+            Class<?> NMS_NBTTagList
+                    = BukkitReflection.getNMSClass("NBTTagList");
+            NMS_NBTTagList_Constructor_Assignment = NMS_NBTTagList.
+                    getConstructor();
+            NMS_NBTTagList_add_Assignment = NMS_NBTTagList.getMethod("add",
+                    NMS_NBTBase);
 
-            Class<?> NMS_NBTTagString = BukkitReflection.getNMSClass("NBTTagString");
-            NMS_NBTTagString_Constructor_String_Assignment = NMS_NBTTagString.getConstructor(String.class);
+            Class<?> NMS_NBTTagString = BukkitReflection.getNMSClass(
+                    "NBTTagString");
+            NMS_NBTTagString_Constructor_String_Assignment = NMS_NBTTagString.
+                    getConstructor(String.class);
 
-        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException ex) {
+        } catch (ClassNotFoundException | NoSuchMethodException
+                | SecurityException ex) {
+
             Bukkit.getLogger().log(Level.SEVERE, null, ex);
 
             NMS_NBTTagCompound_Constructor_Assignment = null;
@@ -135,7 +125,8 @@ public class HeadUtil {
 
         }
 
-        NMS_NBTTagCompound_Constructor = NMS_NBTTagCompound_Constructor_Assignment;
+        NMS_NBTTagCompound_Constructor
+                = NMS_NBTTagCompound_Constructor_Assignment;
         NMS_NBTTagCompound_set = NMS_NBTTagCompound_set_Assignment;
         NMS_NBTTagCompound_setString = NMS_NBTTagCompound_setString_Assignment;
 
@@ -144,12 +135,120 @@ public class HeadUtil {
 
         CB_CraftItemStack = CB_CraftItemStack_Assignment;
         CB_CraftItemStack_asNMSCopy = CB_CraftItemStack_asNMSCopy_Assignment;
-        CB_CraftItemStack_asBukkitCopy = CB_CraftItemStack_asBukkitCopy_Assignment;
+        CB_CraftItemStack_asBukkitCopy
+                = CB_CraftItemStack_asBukkitCopy_Assignment;
 
         NMS_NBTTagList_Constructor = NMS_NBTTagList_Constructor_Assignment;
         NMS_NBTTagList_add = NMS_NBTTagList_add_Assignment;
 
-        NMS_NBTTagString_Constructor_String = NMS_NBTTagString_Constructor_String_Assignment;
+        NMS_NBTTagString_Constructor_String
+                = NMS_NBTTagString_Constructor_String_Assignment;
+    }
+
+    protected static class AsyncPlayerHead extends ItemStack {
+
+        private final ItemStack original;
+        private final OfflinePlayer player;
+
+        public AsyncPlayerHead(OfflinePlayer player)
+                throws IllegalArgumentException {
+
+            super(getBaseHead());
+            original = getBaseHead();
+            this.player = player;
+        }
+
+        private ItemStack getOriginal() {
+            return original;
+        }
+
+        /**
+         * Load the player head item stack and the original player head
+         *
+         * This is because the item stack meta data might have changed
+         */
+        public void loadHead() {
+            setPlayerHead(this, player);
+            setPlayerHead(original, player);
+        }
+    }
+
+    private static ItemStack getBaseHead() {
+        return new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+    }
+
+    private static ItemStack getHead(Object NMS_NBTTagCompound_skullOwner)
+            throws IllegalAccessException, IllegalArgumentException,
+            InvocationTargetException, InstantiationException {
+
+        ItemStack head = getBaseHead();
+
+        Object NMS_ItemStack_itemStack = CB_CraftItemStack_asNMSCopy.invoke(
+                CB_CraftItemStack, head);
+
+        Object NMS_NBTTagCompound_comp = NMS_ItemStack_getTag.invoke(
+                NMS_ItemStack_itemStack);
+
+        if (NMS_NBTTagCompound_comp == null) {
+            NMS_NBTTagCompound_comp = NMS_NBTTagCompound_Constructor.
+                    newInstance();
+        }
+
+        NMS_NBTTagCompound_set.invoke(NMS_NBTTagCompound_comp, "SkullOwner",
+                NMS_NBTTagCompound_skullOwner);
+
+        NMS_ItemStack_setTag.invoke(NMS_ItemStack_itemStack,
+                NMS_NBTTagCompound_comp);
+
+        return (ItemStack) CB_CraftItemStack_asBukkitCopy.invoke(
+                CB_CraftItemStack, NMS_ItemStack_itemStack);
+    }
+
+    private static void getHead(Object NMS_NBTTagCompound_skullOwner,
+            ItemStack head) throws IllegalAccessException,
+            IllegalArgumentException, InvocationTargetException,
+            InstantiationException {
+
+        Object NMS_ItemStack_itemStack = CB_CraftItemStack_asNMSCopy.invoke(
+                CB_CraftItemStack, head);
+
+        Object NMS_NBTTagCompound_comp = NMS_ItemStack_getTag.invoke(
+                NMS_ItemStack_itemStack);
+
+        if (NMS_NBTTagCompound_comp == null) {
+            NMS_NBTTagCompound_comp = NMS_NBTTagCompound_Constructor.
+                    newInstance();
+        }
+
+        NMS_NBTTagCompound_set.invoke(NMS_NBTTagCompound_comp, "SkullOwner",
+                NMS_NBTTagCompound_skullOwner);
+
+        NMS_ItemStack_setTag.invoke(NMS_ItemStack_itemStack,
+                NMS_NBTTagCompound_comp);
+
+        CB_CraftItemStack_asBukkitCopy.invoke(CB_CraftItemStack,
+                NMS_ItemStack_itemStack);
+    }
+
+    private static void setPlayerHead(ItemStack head, OfflinePlayer player) {
+        try {
+            Object NMS_NBTTagCompound_skullOwner
+                    = NMS_NBTTagCompound_Constructor.newInstance();
+
+            NMS_NBTTagCompound_setString.invoke(NMS_NBTTagCompound_skullOwner,
+                    "Id", player.getUniqueId().toString());
+
+            getHead(NMS_NBTTagCompound_skullOwner, head);
+
+            SkullMeta meta = (SkullMeta) head.getItemMeta();
+            meta.setOwner(player.getName());
+            head.setItemMeta(meta);
+
+        } catch (SecurityException | IllegalAccessException
+                | IllegalArgumentException | InvocationTargetException
+                | InstantiationException ex) {
+            Bukkit.getLogger().log(Level.SEVERE, null, ex);
+        }
     }
 
     @Deprecated
@@ -161,7 +260,8 @@ public class HeadUtil {
             return LOADED_PLAYER_HEADS.get(playerUUID).clone();
         }
 
-        if (requestTimestamp + REQUEST_INTERVAL_MILISECONDS < System.currentTimeMillis()) {
+        if (requestTimestamp + REQUEST_INTERVAL_MILISECONDS < System.
+                currentTimeMillis()) {
             requests = 0;
             requestTimestamp = System.currentTimeMillis();
         }
@@ -169,7 +269,7 @@ public class HeadUtil {
         if (requests > MAX_REQUESTS_PER_INTERVAL) {
             return getBaseHead();
         }
-        
+
         requests++;
 
         AsyncPlayerHead baseHead = new AsyncPlayerHead(player);
@@ -179,6 +279,13 @@ public class HeadUtil {
         return baseHead;
     }
 
+    /**
+     * Gets the player head for the given player
+     *
+     * @param player The player head to get
+     *
+     * @return ItemStack for a player head
+     */
     public static ItemStack getPlayerHead(OfflinePlayer player) {
 
         String playerUUID = player.getUniqueId().toString();
@@ -187,7 +294,8 @@ public class HeadUtil {
             return LOADED_PLAYER_HEADS.get(playerUUID).clone();
         }
 
-        if (requestTimestamp + REQUEST_INTERVAL_MILISECONDS < System.currentTimeMillis()) {
+        if (requestTimestamp + REQUEST_INTERVAL_MILISECONDS < System.
+                currentTimeMillis()) {
             requests = 0;
             requestTimestamp = System.currentTimeMillis();
         }
@@ -195,7 +303,7 @@ public class HeadUtil {
         if (requests > MAX_REQUESTS_PER_INTERVAL) {
             return getBaseHead();
         }
-        
+
         requests++;
 
         AsyncPlayerHead baseHead = new AsyncPlayerHead(player);
@@ -205,27 +313,55 @@ public class HeadUtil {
         return baseHead;
     }
 
-    public static ItemStack getTexturedHead(String texture, String displayName) {
+    /**
+     * Gets a textured head for the given texture
+     *
+     * @param texture     The texture to get
+     * @param displayName The display name for the item
+     *
+     * @return The textured player head
+     */
+    public static ItemStack getTexturedHead(
+            String texture, String displayName) {
         return getTexturedHead(texture, displayName, null);
     }
 
-    public static ItemStack getTexturedHead(String texture, String displayName, List<String> lore) {
+    /**
+     * Gets a textured head for the given texture
+     *
+     * @param texture     The texture to get
+     * @param displayName The display name for the item
+     * @param lore        The lore for the item
+     *
+     * @return The textured player head
+     */
+    public static ItemStack getTexturedHead(String texture, String displayName,
+            List<String> lore) {
         try {
-            Object NMS_NBTTagCompound_skullOwner = NMS_NBTTagCompound_Constructor.newInstance();
-            Object NMS_NBTTagCompound_properties = NMS_NBTTagCompound_Constructor.newInstance();
-            Object NMS_NBTTagCompound_valueCompound = NMS_NBTTagCompound_Constructor.newInstance();
+            Object NMS_NBTTagCompound_skullOwner
+                    = NMS_NBTTagCompound_Constructor.newInstance();
+            Object NMS_NBTTagCompound_properties
+                    = NMS_NBTTagCompound_Constructor.newInstance();
+            Object NMS_NBTTagCompound_valueCompound
+                    = NMS_NBTTagCompound_Constructor.newInstance();
 
-            Object NMS_NBTTagList_textures = NMS_NBTTagList_Constructor.newInstance();
+            Object NMS_NBTTagList_textures
+                    = NMS_NBTTagList_Constructor.newInstance();
 
-            Object NMS_NBTTagString_value = NMS_NBTTagString_Constructor_String.newInstance(texture);
+            Object NMS_NBTTagString_value
+                    = NMS_NBTTagString_Constructor_String.newInstance(texture);
 
-            NMS_NBTTagCompound_set.invoke(NMS_NBTTagCompound_valueCompound, "Value", NMS_NBTTagString_value);
+            NMS_NBTTagCompound_set.invoke(NMS_NBTTagCompound_valueCompound,
+                    "Value", NMS_NBTTagString_value);
 
-            NMS_NBTTagList_add.invoke(NMS_NBTTagList_textures, NMS_NBTTagCompound_valueCompound);
+            NMS_NBTTagList_add.invoke(NMS_NBTTagList_textures,
+                    NMS_NBTTagCompound_valueCompound);
 
-            NMS_NBTTagCompound_set.invoke(NMS_NBTTagCompound_properties, "textures", NMS_NBTTagList_textures);
+            NMS_NBTTagCompound_set.invoke(NMS_NBTTagCompound_properties,
+                    "textures", NMS_NBTTagList_textures);
 
-            NMS_NBTTagCompound_set.invoke(NMS_NBTTagCompound_skullOwner, "Properties", NMS_NBTTagCompound_properties);
+            NMS_NBTTagCompound_set.invoke(NMS_NBTTagCompound_skullOwner,
+                    "Properties", NMS_NBTTagCompound_properties);
 
             String uuid;
             if (TEXTURES.containsKey(texture)) {
@@ -235,7 +371,8 @@ public class HeadUtil {
                 TEXTURES.put(texture, uuid);
             }
 
-            NMS_NBTTagCompound_setString.invoke(NMS_NBTTagCompound_skullOwner, "Id", uuid);
+            NMS_NBTTagCompound_setString.invoke(NMS_NBTTagCompound_skullOwner,
+                    "Id", uuid);
 
             ItemStack head = getHead(NMS_NBTTagCompound_skullOwner);
 
@@ -247,66 +384,14 @@ public class HeadUtil {
             head.setItemMeta(itemMeta);
 
             return head;
-        } catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException ex) {
+        } catch (SecurityException | IllegalAccessException
+                | IllegalArgumentException | InvocationTargetException
+                | InstantiationException ex) {
+
             Bukkit.getLogger().log(Level.SEVERE, null, ex);
         }
+
         return getBaseHead();
-    }
-
-    private static void setPlayerHead(ItemStack head, OfflinePlayer player) {
-        try {
-            Object NMS_NBTTagCompound_skullOwner = NMS_NBTTagCompound_Constructor.newInstance();
-
-            NMS_NBTTagCompound_setString.invoke(NMS_NBTTagCompound_skullOwner, "Id", player.getUniqueId().toString());
-
-            getHead(NMS_NBTTagCompound_skullOwner, head);
-
-            SkullMeta meta = (SkullMeta) head.getItemMeta();
-            meta.setOwner(player.getName());
-            head.setItemMeta(meta);
-
-        } catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException ex) {
-            Bukkit.getLogger().log(Level.SEVERE, null, ex);
-        }
-    }
-
-    private static ItemStack getHead(Object NMS_NBTTagCompound_skullOwner) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
-        ItemStack head = getBaseHead();
-
-        Object NMS_ItemStack_itemStack = CB_CraftItemStack_asNMSCopy.invoke(CB_CraftItemStack, head);
-
-        Object NMS_NBTTagCompound_comp = NMS_ItemStack_getTag.invoke(NMS_ItemStack_itemStack);
-
-        if (NMS_NBTTagCompound_comp == null) {
-            NMS_NBTTagCompound_comp = NMS_NBTTagCompound_Constructor.newInstance();
-        }
-
-        NMS_NBTTagCompound_set.invoke(NMS_NBTTagCompound_comp, "SkullOwner", NMS_NBTTagCompound_skullOwner);
-
-        NMS_ItemStack_setTag.invoke(NMS_ItemStack_itemStack, NMS_NBTTagCompound_comp);
-
-        return (ItemStack) CB_CraftItemStack_asBukkitCopy.invoke(CB_CraftItemStack, NMS_ItemStack_itemStack);
-    }
-
-    private static void getHead(Object NMS_NBTTagCompound_skullOwner, ItemStack head) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
-
-        Object NMS_ItemStack_itemStack = CB_CraftItemStack_asNMSCopy.invoke(CB_CraftItemStack, head);
-
-        Object NMS_NBTTagCompound_comp = NMS_ItemStack_getTag.invoke(NMS_ItemStack_itemStack);
-
-        if (NMS_NBTTagCompound_comp == null) {
-            NMS_NBTTagCompound_comp = NMS_NBTTagCompound_Constructor.newInstance();
-        }
-
-        NMS_NBTTagCompound_set.invoke(NMS_NBTTagCompound_comp, "SkullOwner", NMS_NBTTagCompound_skullOwner);
-
-        NMS_ItemStack_setTag.invoke(NMS_ItemStack_itemStack, NMS_NBTTagCompound_comp);
-
-        CB_CraftItemStack_asBukkitCopy.invoke(CB_CraftItemStack, NMS_ItemStack_itemStack);
-    }
-
-    private static ItemStack getBaseHead() {
-        return new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
     }
 
 }
