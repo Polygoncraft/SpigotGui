@@ -7,16 +7,36 @@ import me.killje.spigotgui.util.InventoryBase;
 import org.bukkit.entity.Player;
 
 /**
+ * Creates a number board inventory
  *
  * @author Patrick Beuks (killje) <patrick.beuks@gmail.com>
  */
-public abstract class NumberBoard extends InventoryBase implements StorageUpdateListener {
+public abstract class NumberBoard extends InventoryBase implements
+        StorageUpdateListener {
 
+    /**
+     * The storage to store the entered numbers
+     */
     private final AmountStorage amountStorage;
+    /**
+     * The player using the board
+     */
     private final Player player;
+    /**
+     * The element to set the amount
+     */
     private final GuiElement setAmountButton;
 
-    public NumberBoard(GuiSetting guiSettings, Player player, SetAmountButton setAmountButton) {
+    /**
+     * Creates a number board to enter a amount for
+     *
+     * @param guiSettings     The GuiSettings to load the number icons from
+     * @param player          The player typing
+     * @param setAmountButton The button to set the amount for
+     */
+    @SuppressWarnings("LeakingThisInConstructor")
+    public NumberBoard(GuiSetting guiSettings, Player player,
+            SetAmountButton setAmountButton) {
         super(guiSettings);
         amountStorage = new AmountStorage();
         amountStorage.addListener(this);
@@ -25,6 +45,40 @@ public abstract class NumberBoard extends InventoryBase implements StorageUpdate
         setAmountButton.setAmountStorage(amountStorage);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onStorageupdateEvent() {
+        player.openInventory(this.getInventory());
+
+        getPluginUtil().runTask(new Runnable() {
+            @Override
+            public void run() {
+                player.updateInventory();
+            }
+        });
+    }
+
+    /**
+     * Returns the storage with the current entered amount
+     *
+     * @return The storage
+     */
+    protected final AmountStorage getAmountStorage() {
+        return amountStorage;
+    }
+
+    /**
+     * Get the inventory name for the inventory
+     *
+     * @return The inventory name
+     */
+    protected abstract String getInventoryName();
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void initInventory() {
 
@@ -47,23 +101,5 @@ public abstract class NumberBoard extends InventoryBase implements StorageUpdate
                 .addGuiElement(setAmountButton)
                 .addGuiElement(new Exit(), 8);
     }
-
-    @Override
-    public void onStorageupdateEvent() {
-        player.openInventory(this.getInventory());
-
-        getPluginUtil().runTask(new Runnable() {
-            @Override
-            public void run() {
-                player.updateInventory();
-            }
-        });
-    }
-
-    protected final AmountStorage getAmountStorage() {
-        return amountStorage;
-    }
-
-    protected abstract String getInventoryName();
 
 }

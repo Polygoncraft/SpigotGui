@@ -7,20 +7,49 @@ import me.killje.spigotgui.util.InventoryBase;
 import org.bukkit.entity.Player;
 
 /**
+ * A inventory that acts as a keyboard
  *
  * @author Patrick Beuks (killje) <patrick.beuks@gmail.com>
  */
-public abstract class KeyBoard extends InventoryBase implements StorageUpdateListener {
+public abstract class KeyBoard extends InventoryBase implements
+        StorageUpdateListener {
 
+    /**
+     * The storage used for adding characters typed
+     */
     private final KeyBoardStringStorage keyBoardStringStorage;
+    /**
+     * The player using the keyboard
+     */
     private final Player player;
+    /**
+     * The element that is used to set the string to
+     *
+     * This is optional
+     */
     private final GuiElement setStringButton;
 
+    /**
+     * Creates a new keyboard
+     *
+     * @param guiSettings The gui settings to get the characters from
+     * @param player      The player using the keyboard
+     */
     public KeyBoard(GuiSetting guiSettings, Player player) {
         this(guiSettings, player, null);
     }
 
-    public KeyBoard(GuiSetting guiSettings, Player player, SetStringButton setStringButton) {
+    /**
+     * Creates a new keyboard
+     *
+     * @param guiSettings     The gui settings to get the characters from
+     * @param player          The player using the keyboard
+     * @param setStringButton The icon to use to set the entered string
+     */
+    @SuppressWarnings("LeakingThisInConstructor")
+    public KeyBoard(GuiSetting guiSettings, Player player,
+            SetStringButton setStringButton) {
+
         super(guiSettings);
         keyBoardStringStorage = new KeyBoardStringStorage();
         keyBoardStringStorage.addListener(this);
@@ -31,11 +60,28 @@ public abstract class KeyBoard extends InventoryBase implements StorageUpdateLis
         }
     }
 
+    /**
+     * Creates a new keyboard
+     *
+     * @param guiSettings The gui settings to get the characters from
+     * @param player      The player using the keyboard
+     * @param rows        Sets the rows of the inventory
+     */
     public KeyBoard(GuiSetting guiSettings, Player player, int rows) {
         this(guiSettings, player, rows, null);
     }
 
-    public KeyBoard(GuiSetting guiSettings, Player player, int rows, SetStringButton setStringButton) {
+    /**
+     * Creates a new keyboard
+     *
+     * @param guiSettings     The gui settings to get the characters from
+     * @param player          The player using the keyboard
+     * @param rows            Sets the rows of the inventory
+     * @param setStringButton The icon to use to set the entered string
+     */
+    @SuppressWarnings("LeakingThisInConstructor")
+    public KeyBoard(GuiSetting guiSettings, Player player, int rows,
+            SetStringButton setStringButton) {
         super(guiSettings, rows);
         keyBoardStringStorage = new KeyBoardStringStorage();
         keyBoardStringStorage.addListener(this);
@@ -46,6 +92,36 @@ public abstract class KeyBoard extends InventoryBase implements StorageUpdateLis
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onStorageupdateEvent() {
+        updateInventory(player);
+    }
+
+    /**
+     * Gets the inventory name. This is the same as the current string in the
+     * storage
+     *
+     * @return The inventory name
+     */
+    protected String getInventoryName() {
+        return getKeyBoardStringStorage().getCurrent();
+    }
+
+    /**
+     * Get the storage for the keyboard
+     *
+     * @return The storage
+     */
+    protected final KeyBoardStringStorage getKeyBoardStringStorage() {
+        return keyBoardStringStorage;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void initInventory() {
 
@@ -55,10 +131,13 @@ public abstract class KeyBoard extends InventoryBase implements StorageUpdateLis
         if (setStringButton != null) {
 
             this
-                    .addGuiElement(new Undo(keyBoardStringStorage, "undo.character"))
+                    .addGuiElement(new Undo(keyBoardStringStorage,
+                            "undo.character"))
                     .addGuiElement(setStringButton);
         } else {
-            this.addGuiElement(new Undo(keyBoardStringStorage, "undo.character"), 4);
+            this.
+                    addGuiElement(new Undo(keyBoardStringStorage,
+                            "undo.character"), 4);
         }
 
         this
@@ -99,19 +178,6 @@ public abstract class KeyBoard extends InventoryBase implements StorageUpdateLis
                 .addGuiElement(new Character('X', keyBoardStringStorage))
                 .addGuiElement(new Character('Y', keyBoardStringStorage))
                 .addGuiElement(new Character('Z', keyBoardStringStorage));
-    }
-
-    @Override
-    public void onStorageupdateEvent() {
-        updateInventory(player);
-    }
-
-    protected final KeyBoardStringStorage getKeyBoardStringStorage() {
-        return keyBoardStringStorage;
-    }
-
-    protected String getInventoryName() {
-        return getKeyBoardStringStorage().getCurrent();
     }
 
 }
