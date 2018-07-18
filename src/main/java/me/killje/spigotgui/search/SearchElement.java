@@ -9,31 +9,59 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 /**
+ * A icon that when clicked will open a search inventory
  *
  * @author Patrick Beuks (killje) <patrick.beuks@gmail.com>
  */
 public class SearchElement implements GuiElement {
 
-    private final Searchable searchable;
+    /**
+     * The searcher for player searching.
+     *
+     * This of searchable needs to be set
+     */
     private final PlayerListSearcher playerListSearcher;
+    /**
+     * The map to be used for searching
+     *
+     * This or playerListSearcher needs to be set
+     */
+    private final Searchable searchable;
 
+    /**
+     * Creates a icon that when clicked opens a inventory to search items
+     *
+     * @param searchable The map to search through
+     */
     public SearchElement(Searchable searchable) {
         this.searchable = searchable;
         playerListSearcher = null;
     }
-    
+
+    /**
+     * Creates a icon that when clicked opens a inventory to search players
+     *
+     * @param playerListSearcher The players to search through
+     */
     public SearchElement(PlayerListSearcher playerListSearcher) {
         this.searchable = null;
         this.playerListSearcher = playerListSearcher;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ItemStack getItemStack(GuiSetting guiSettings) {
         return guiSettings.getItemStack("search");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void onInventoryClickEvent(InventoryBase currentinventoryBase, InventoryClickEvent event) {
+    public void onInventoryClickEvent(InventoryBase currentinventoryBase,
+            InventoryClickEvent event) {
 
         if (!(event.getWhoClicked() instanceof Player)) {
             return;
@@ -41,22 +69,19 @@ public class SearchElement implements GuiElement {
 
         Player player = (Player) event.getWhoClicked();
 
-        
         Search search;
         if (searchable != null) {
-            search = new Search(currentinventoryBase.getGuiSettings(), player, searchable.getElementMap());
-            
+            search = new Search(currentinventoryBase.getGuiSettings(), player,
+                    searchable.getElementMap());
+
             if (searchable.InventoryBeforeSearch() != null) {
                 search.setPrevInventory(searchable.InventoryBeforeSearch());
             }
         } else {
-            search = new Search(currentinventoryBase.getGuiSettings(), player, playerListSearcher);
-            
-            if (playerListSearcher.InventoryBeforeSearch() != null) {
-                search.setPrevInventory(playerListSearcher.InventoryBeforeSearch());
-            }
+            search = new Search(currentinventoryBase.getGuiSettings(), player,
+                    playerListSearcher);
         }
-        
+
         currentinventoryBase.openNewInventory(player, search);
     }
 
