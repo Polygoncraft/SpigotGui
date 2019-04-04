@@ -5,10 +5,8 @@ import de.tr7zw.itemnbtapi.NBTItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.logging.Level;
 import org.bukkit.ChatColor;
-import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
@@ -27,8 +25,6 @@ public class GuiSetting {
      */
     private final static Map<String, String> chatColors = new HashMap<>();
 
-    private final static Map<String, String> conversionMap = new HashMap<>();
-
     /**
      * Populate the chatcolor map
      */
@@ -37,14 +33,6 @@ public class GuiSetting {
         for (ChatColor chatColor : chatColorList) {
             chatColors.put(chatColor.name(), chatColor.toString());
         }
-
-        conversionMap.put("YELLOW_DYE", Material.DANDELION_YELLOW.name());
-        conversionMap.put("GREEN_DYE", Material.CACTUS_GREEN.name());
-        conversionMap.put("RED_DYE", Material.ROSE_RED.name());
-        conversionMap.put("BLUE_DYE", Material.LAPIS_LAZULI.name());
-        conversionMap.put("BLACK_DYE", Material.INK_SAC.name());
-        conversionMap.put("WHITE_DYE", Material.BONE_MEAL.name());
-        conversionMap.put("BROWN_DYE", Material.COCOA_BEANS.name());
     }
 
     /**
@@ -93,10 +81,6 @@ public class GuiSetting {
                 return;
             }
 
-            if (section.contains("type")) {
-                updateSection(section);
-            }
-
             if (item == null && section.contains("item")) {
                 item = new ItemStack(Material.getMaterial(
                         section.getString("item")
@@ -127,64 +111,6 @@ public class GuiSetting {
                     extractInformation(section.getString("use"));
                 }
             }
-        }
-
-        private void updateSection(ConfigurationSection section) {
-            String value = section.getString("value");
-            String color = section.getString("color");
-
-            DyeColor dyeColor = DyeColor.WHITE;
-            if (color != null) {
-                section.set("color", null);
-                System.out.println(color);
-
-                dyeColor = DyeColor.valueOf(color);
-                System.out.println(dyeColor);
-            }
-
-            switch (section.getString("type")) {
-                case "head":
-                    String nbt = "{SkullOwner:{Id:\""
-                            + UUID.randomUUID().toString()
-                            + "\",Properties:{textures:[{Value:\""
-                            + value + "\"}]}}}";
-                    section.set("nbt", nbt);
-                    section.set("item", Material.PLAYER_HEAD.name());
-                    section.set("value", null);
-                    break;
-                case "item":
-                    if (color != null) {
-                        String dyeName = dyeColor.name() + "_" + value;
-                        if (conversionMap.containsKey(dyeName)) {
-                            section.set("item", Material.getMaterial(
-                                    conversionMap.get(dyeName)
-                            ).name());
-                            break;
-                        }
-                        if (Material.getMaterial(dyeName) != null) {
-                            section.set("item", Material.getMaterial(dyeName)
-                                    .name());
-                            break;
-                        }
-                    }
-                    if (Material.getMaterial(value) != null) {
-                        section.set("item", Material.getMaterial(value).name());
-                        break;
-                    }
-                    if (Material.getMaterial(value, true) != null) {
-                        section.set("item", Material.getMaterial(value, true)
-                                .name());
-                        break;
-                    }
-                    getPluginUtil().getLogger().log(Level.SEVERE,
-                            "Could not find a matching material for: ''{0}''",
-                            value);
-                    break;
-
-            }
-            section.set("type", null);
-            section.set("value", null);
-            guiFile.SaveConfig();
         }
 
         /**
