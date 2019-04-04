@@ -1,8 +1,11 @@
 package me.killje.spigotgui.util;
 
+import de.tr7zw.itemnbtapi.NBTContainer;
+import de.tr7zw.itemnbtapi.NBTItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Level;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
@@ -10,13 +13,12 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.material.Dye;
 import org.bukkit.plugin.Plugin;
 
 /**
  * This class is to load gui icons and text from a file
  *
- * @author Patrick Beuks (killje) <patrick.beuks@gmail.com>
+ * @author Patrick Beuks (killje) <code@beuks.net>
  */
 public class GuiSetting {
 
@@ -24,6 +26,8 @@ public class GuiSetting {
      * Bukkit chatcolors conversion map
      */
     private final static Map<String, String> chatColors = new HashMap<>();
+
+    private final static Map<String, String> conversionMap = new HashMap<>();
 
     /**
      * Populate the chatcolor map
@@ -33,6 +37,14 @@ public class GuiSetting {
         for (ChatColor chatColor : chatColorList) {
             chatColors.put(chatColor.name(), chatColor.toString());
         }
+
+        conversionMap.put("YELLOW_DYE", Material.DANDELION_YELLOW.name());
+        conversionMap.put("GREEN_DYE", Material.CACTUS_GREEN.name());
+        conversionMap.put("RED_DYE", Material.ROSE_RED.name());
+        conversionMap.put("BLUE_DYE", Material.LAPIS_LAZULI.name());
+        conversionMap.put("BLACK_DYE", Material.INK_SAC.name());
+        conversionMap.put("WHITE_DYE", Material.BONE_MEAL.name());
+        conversionMap.put("BROWN_DYE", Material.COCOA_BEANS.name());
     }
 
     /**
@@ -41,10 +53,6 @@ public class GuiSetting {
      */
     private class GUIElementInformation {
 
-        /**
-         * Color from file
-         */
-        private String color = null;
         /**
          * Section that this object parses
          */
@@ -58,14 +66,7 @@ public class GuiSetting {
          * The lore from file
          */
         private List<String> lore;
-        /**
-         * The item type from file
-         */
-        private String type;
-        /**
-         * The value from file
-         */
-        private String value;
+        private ItemStack item;
 
         /**
          * Creates a new element from the section
@@ -92,16 +93,21 @@ public class GuiSetting {
                 return;
             }
 
-            if (type == null && section.contains("type")) {
-                type = section.getString("type");
+            if (section.contains("type")) {
+                updateSection(section);
             }
 
-            if (value == null && section.contains("value")) {
-                value = section.getString("value");
-            }
-
-            if (color == null && section.contains("color")) {
-                color = section.getString("color");
+            if (item == null && section.contains("item")) {
+                item = new ItemStack(Material.getMaterial(
+                        section.getString("item")
+                ));
+                if (section.contains("nbt")) {
+                    String nbt = section.getString("nbt");
+                    NBTContainer nbtContainer = new NBTContainer(nbt);
+                    NBTItem itemNBT = new NBTItem(item);
+                    itemNBT.mergeCompound(nbtContainer);
+                    item = itemNBT.getItem();
+                }
             }
 
             if (displayName == null && section.contains("displayName")) {
@@ -123,21 +129,70 @@ public class GuiSetting {
             }
         }
 
-        /**
-         * Get the color from file
-         *
-         * @return The color
-         */
-        public String getColor() {
-            return color;
+        private void updateSection(ConfigurationSection section) {
+            String value = section.getString("value");
+            String color = section.getString("color");
+
+            DyeColor dyeColor = DyeColor.WHITE;
+            if (color != null) {
+                section.set("color", null);
+                System.out.println(color);
+
+                dyeColor = DyeColor.valueOf(color);
+                System.out.println(dyeColor);
+            }
+
+            switch (section.getString("type")) {
+                case "head":
+                    String nbt = "{SkullOwner:{Id:\""
+                            + UUID.randomUUID().toString()
+                            + "\",Properties:{textures:[{Value:\""
+                            + value + "\"}]}}}";
+                    section.set("nbt", nbt);
+                    section.set("item", Material.PLAYER_HEAD.name());
+                    section.set("value", null);
+                    break;
+                case "item":
+                    if (color != null) {
+                        String dyeName = dyeColor.name() + "_" + value;
+                        if (conversionMap.containsKey(dyeName)) {
+                            section.set("item", Material.getMaterial(
+                                    conversionMap.get(dyeName)
+                            ).name());
+                            break;
+                        }
+                        if (Material.getMaterial(dyeName) != null) {
+                            section.set("item", Material.getMaterial(dyeName)
+                                    .name());
+                            break;
+                        }
+                    }
+                    if (Material.getMaterial(value) != null) {
+                        section.set("item", Material.getMaterial(value).name());
+                        break;
+                    }
+                    if (Material.getMaterial(value, true) != null) {
+                        section.set("item", Material.getMaterial(value, true)
+                                .name());
+                        break;
+                    }
+                    getPluginUtil().getLogger().log(Level.SEVERE,
+                            "Could not find a matching material for: ''{0}''",
+                            value);
+                    break;
+
+            }
+            section.set("type", null);
+            section.set("value", null);
+            guiFile.SaveConfig();
         }
 
         /**
          * Get the display name from file
          *
          * @param replaceMap Parses values in the display name with these
-         *                   values. The keys are being parsed with a % in front
-         *                   in the display name
+         * values. The keys are being parsed with a % in front in the display
+         * name
          *
          * @return The parsed name
          */
@@ -174,22 +229,8 @@ public class GuiSetting {
             return lore;
         }
 
-        /**
-         * Get the type from file
-         *
-         * @return The file
-         */
-        public String getType() {
-            return type;
-        }
-
-        /**
-         * Get the value from file
-         *
-         * @return The value
-         */
-        public String getValue() {
-            return value;
+        public ItemStack getItem() {
+            return item;
         }
     }
 
@@ -208,87 +249,11 @@ public class GuiSetting {
     }
 
     /**
-     * Creates a dye item stack
-     *
-     * @param displayName The name of the dye
-     * @param lore        The lore to add to the dye
-     *
-     * @return The parsed ItemStack
-     */
-    private ItemStack createDyeItemStack(
-            String displayName, List<String> lore) {
-        return createDyeItemStack(displayName, lore, null);
-    }
-
-    /**
-     * Creates a dye item stack
-     *
-     * @param displayName The name of the dye
-     * @param lore        The lore to add to the dye
-     * @param color       Color of the dye
-     *
-     * @return The parsed ItemStack
-     */
-    private ItemStack createDyeItemStack(String displayName, List<String> lore,
-            DyeColor color) {
-        ItemStack itemStack;
-        if (color != null) {
-            itemStack = new Dye(color).toItemStack(1);
-        } else {
-            itemStack = new Dye().toItemStack(1);
-        }
-        setDataOnItemStack(itemStack, displayName, lore);
-        return itemStack;
-    }
-
-    /**
-     *
-     * Creates a item stack from the given material
-     *
-     * @param material    The material to create the item stack out of
-     * @param displayName The name for the ItemStack
-     * @param lore        The lore on the ItemStack
-     *
-     * @return The parsed ItemStack
-     */
-    private ItemStack createItemStack(Material material, String displayName,
-            List<String> lore) {
-        return createItemStack(material, displayName, lore, (short) -1);
-    }
-
-    /**
-     *
-     * Creates a item stack from the given material
-     *
-     * @param material    The material to create the item stack out of
-     * @param displayName The name for the ItemStack
-     * @param lore        The lore on the ItemStack
-     * @param damage      The damage value for the item
-     *
-     * @return The parsed ItemStack
-     */
-    private ItemStack createItemStack(Material material, String displayName,
-            List<String> lore, short damage) {
-        if (material == null) {
-            return null;
-        }
-        ItemStack itemStack;
-        if (damage != -1) {
-            itemStack = new ItemStack(material, 1, damage);
-        } else {
-            itemStack = new ItemStack(material);
-        }
-        setDataOnItemStack(itemStack, displayName, lore);
-        return itemStack;
-    }
-
-    /**
      * Sets the display name and lore on a item stack
      *
-     * @param itemStack   The ItemStack to change
+     * @param itemStack The ItemStack to change
      * @param displayName The display name to set
-     * @param lore        The lore to set, can be null to not apply it on the
-     *                    item
+     * @param lore The lore to set, can be null to not apply it on the item
      */
     private void setDataOnItemStack(ItemStack itemStack, String displayName,
             List<String> lore) {
@@ -315,7 +280,7 @@ public class GuiSetting {
      * Gets the item stack with the given name from the gui file with the
      * replace map for parsing of display name and lore
      *
-     * @param name       The item to retrieve
+     * @param name The item to retrieve
      * @param replaceMap The items to replace in the display name and lore
      *
      * @return The parsed ItemStack
@@ -325,52 +290,17 @@ public class GuiSetting {
         GUIElementInformation elementInformation
                 = new GUIElementInformation(name);
 
-        String type = elementInformation.getType();
+        ItemStack item = elementInformation.getItem();
 
-        if (type == null) {
+        if (item == null) {
             return null;
         }
 
-        String value = elementInformation.getValue();
         String displayName = elementInformation.getDisplayName(replaceMap);
         List<String> lore = elementInformation.getLore();
-        String color = elementInformation.getColor();
 
-        switch (type) {
-
-            case "head":
-                return HeadUtil.getTexturedHead(value, displayName, lore);
-            case "item":
-                ItemStack itemStack;
-                switch (value) {
-                    // Because dye is not a material stack in bukkit -.-
-                    case "DYE":
-                        if (color != null) {
-                            itemStack = createDyeItemStack(displayName, lore,
-                                    DyeColor.valueOf(color));
-                        } else {
-                            itemStack = createDyeItemStack(displayName, lore);
-                        }
-                        break;
-                    default:
-                        Material material = Material.getMaterial(value);
-                        if (color != null) {
-                            itemStack = createItemStack(
-                                    material, displayName, lore,
-                                    DyeColor.valueOf(color).getWoolData()
-                            );
-
-                        } else {
-                            itemStack = createItemStack(material, displayName,
-                                    lore);
-                        }
-                        break;
-                }
-                return itemStack;
-            default:
-                return null;
-        }
-
+        setDataOnItemStack(item, displayName, lore);
+        return item;
     }
 
     /**
@@ -396,7 +326,7 @@ public class GuiSetting {
     /**
      * Get text from the gui file
      *
-     * @param name       The item name
+     * @param name The item name
      * @param replaceMap The replace map to replace items in the text with
      *
      * @return The parsed text from gui file
