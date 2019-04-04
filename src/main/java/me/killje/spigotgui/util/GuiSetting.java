@@ -24,6 +24,8 @@ public class GuiSetting {
      * Bukkit chatcolors conversion map
      */
     private final static Map<String, String> chatColors = new HashMap<>();
+    
+    private final static Map<String, GUIElementInformation> cache = new HashMap<>();
 
     /**
      * Populate the chatcolor map
@@ -213,8 +215,13 @@ public class GuiSetting {
      */
     public ItemStack getItemStack(String name, Map<String, String> replaceMap) {
 
-        GUIElementInformation elementInformation
-                = new GUIElementInformation(name);
+        GUIElementInformation elementInformation;
+        if (cache.containsKey(name)) {
+            elementInformation = cache.get(name);
+        } else {
+            elementInformation = new GUIElementInformation(name);
+            cache.put(name, elementInformation);
+        }
 
         ItemStack item = elementInformation.getItem();
 
